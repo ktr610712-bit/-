@@ -45,50 +45,13 @@ export default function CompanyIntro() {
             <h3 className="text-xl md:text-2xl font-black text-slate-900 leading-snug tracking-tight">
               &ldquo;인류와 환경을 먼저 생각하는 <span className="text-orange-500">PE 약품 저장탱크 전문 제조 파트너</span>&rdquo;
             </h3>
-            <p className="text-slate-700 text-sm md:text-base leading-relaxed">
+            <p className="text-slate-705 text-sm md:text-base leading-relaxed">
               안녕하십니까? 울트라월드(주) 홈페이지를 찾아주신 존경하는 바이어 및 협력사 임직원 여러분께 진심으로 깊은 감사의 인사를 올립니다.
             </p>
             <p className="text-slate-600 text-sm md:text-base leading-relaxed">
               저희 울트라월드 주식회사는 오랜 현장 가공 실무 기술을 축적한 엔지니어들이 주축이 되어 설립되었습니다. 
-              부식성이 강하고 엄격한 관리가 뒷받침되어야 하는 화학 약품탱크와 산업용 케미칼탱크 전문 제조업체로서, 
-              <strong> 최첨단 고장력 회전 가열 성형 가공 기술</strong>을 사용하여 접합부나 용접 틈새가 전혀 발생하지 않는 완벽한 
-              <strong> 일체식 폴리에틸렌 저장탱크</strong>를 전문적으로 양산해 오고 있습니다.
+              부식성이 강하고 엄격한 관리가 뒷받침되어야 하는 화학 약품탱크와 산업용 케미칼탱크 전문 제조업체 입니다.
             </p>
-          </div>
-
-          {/* Three Core Commitments block (Bento style) */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-2">
-            
-            <div className="bg-slate-50 border border-slate-150 p-5 rounded-xl space-y-3.5">
-              <div className="w-9 h-9 bg-orange-100 rounded-lg flex items-center justify-center text-orange-600">
-                <ShieldCheck className="w-5 h-5" />
-              </div>
-              <h4 className="font-bold text-slate-900 text-sm">빈틈 없는 최고의 기밀성</h4>
-              <p className="text-slate-500 text-xs leading-normal">
-                미세한 이음새 조차 허용하지 않는 완전 일체 전용 회전 압출 성형법으로, 수백 톤의 유체 압력하에서도 영구적인 누수 방지를 제공합니다.
-              </p>
-            </div>
-
-            <div className="bg-slate-50 border border-slate-150 p-5 rounded-xl space-y-3.5">
-              <div className="w-9 h-9 bg-slate-200 rounded-lg flex items-center justify-center text-slate-800">
-                <Award className="w-5 h-5" />
-              </div>
-              <h4 className="font-bold text-slate-900 text-sm">공학적 STS 이중 보강링</h4>
-              <p className="text-slate-500 text-xs leading-normal">
-                온도 변동과 수압 하중에 완벽히 대항하도록 고안된 이중 강도 밴드(오렌지색 링 및 중방식 STS 밴딩)를 설계 배분하여 안정성을 극대화합니다.
-              </p>
-            </div>
-
-            <div className="bg-slate-50 border border-slate-150 p-5 rounded-xl space-y-3.5">
-              <div className="w-9 h-9 bg-emerald-100 rounded-lg flex items-center justify-center text-emerald-600">
-                <CheckCircle className="w-5 h-5" />
-              </div>
-              <h4 className="font-bold text-slate-900 text-sm">고객 맞춤형 1:1 도면 대응</h4>
-              <p className="text-slate-500 text-xs leading-normal">
-                현장 배관 설계 도면에 부합하는 다양한 피팅 직경(25A ~ 100A), 특수 교반기 구조, 안전 센서 사출구 등을 정밀 성형 단계에서 무상 설계 조율합니다.
-              </p>
-            </div>
-
           </div>
 
           {/* Signoff */}

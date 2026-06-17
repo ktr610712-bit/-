@@ -10,10 +10,12 @@ interface HeroProps {
   onConsultClick: () => void;
   heroBadgeText: string;
   onEditHeroBadgeText: () => void;
+  heroImageUrl: string;
+  onEditHeroImageUrl: () => void;
   isAdmin: boolean;
 }
 
-export default function Hero({ onConsultClick, heroBadgeText, onEditHeroBadgeText, isAdmin }: HeroProps) {
+export default function Hero({ onConsultClick, heroBadgeText, onEditHeroBadgeText, heroImageUrl, onEditHeroImageUrl, isAdmin }: HeroProps) {
   return (
     <section className="relative flex items-center bg-slate-900 overflow-hidden py-12 lg:py-16 border-b border-slate-950" id="hero-banner">
       {/* Background Gradient overlay */}
@@ -74,12 +76,23 @@ export default function Hero({ onConsultClick, heroBadgeText, onEditHeroBadgeTex
             <div className="w-72 h-72 sm:w-85 sm:h-85 md:w-96 md:h-96 border-[12px] border-orange-500 rounded-full flex items-center justify-center overflow-hidden bg-slate-800 shadow-2xl relative">
               {/* Image from generate_image inside the circular frame */}
               <img
-                src="/src/assets/images/hero_chemical_tank_1781660858614.jpg"
+                src={heroImageUrl}
                 alt="울트라월드 PE 보강식 케미칼탱크 사진"
                 className="w-full h-full object-cover hover:scale-110 duration-700 transition-transform absolute inset-0"
                 referrerPolicy="no-referrer"
                 id="hero-img"
               />
+              
+              {isAdmin && onEditHeroImageUrl && (
+                <button
+                  onClick={(e) => { e.stopPropagation(); onEditHeroImageUrl(); }}
+                  className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-12 z-35 bg-orange-500 hover:bg-orange-600 text-white px-3.5 py-2 rounded-full shadow-lg border border-white hover:scale-110 transition-transform flex items-center gap-1.5 cursor-pointer text-2xs font-extrabold focus:outline-none"
+                  title="대표 사진 URL 수정하기"
+                >
+                  <Edit className="w-3.5 h-3.5" />
+                  <span>사진 수정</span>
+                </button>
+              )}
               
               {/* Overlay elements */}
               <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent pointer-events-none" />

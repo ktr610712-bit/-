@@ -13,6 +13,7 @@ interface SidebarProps {
   selectedCategory: Category;
   setSelectedCategory: (category: Category) => void;
   onScrollToSection?: (sectionId: string) => void;
+  onViewCatalogue: () => void;
 }
 
 export default function Sidebar({
@@ -21,6 +22,7 @@ export default function Sidebar({
   selectedCategory,
   setSelectedCategory,
   onScrollToSection,
+  onViewCatalogue,
 }: SidebarProps) {
   
   const categoriesList = [
@@ -125,31 +127,27 @@ export default function Sidebar({
         </div>
       </div>
 
-      {/* 3. B2B Quick Hotline */}
-      <div className="bg-gradient-to-br from-blue-50 to-indigo-50/50 rounded-xl p-4 border border-blue-100 space-y-3">
+      {/* 3. 울트라 탱크 종합 카달로그 */}
+      <div className="bg-gradient-to-br from-orange-50 to-amber-50/40 rounded-xl p-4 border border-orange-100 space-y-3 shadow-2xs">
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-full bg-blue-900 flex items-center justify-center shrink-0">
-            <ShieldCheck className="w-4.5 h-4.5 text-white font-bold" />
+          <div className="w-8 h-8 rounded-full bg-orange-500 flex items-center justify-center shrink-0">
+            <Layers className="w-4.5 h-4.5 text-white" />
           </div>
           <div>
-            <h4 className="font-extrabold text-xs text-slate-900">품질안전 보증</h4>
-            <p className="text-[10px] text-slate-505">울트라월드 정품 인증</p>
+            <h4 className="font-extrabold text-xs text-slate-900">종합 카달로그</h4>
+            <p className="text-[10px] text-orange-600 font-extrabold uppercase tracking-wider">Ultra Tank Booklet</p>
           </div>
         </div>
-        <div className="bg-white/80 p-2.5 rounded border border-blue-50 text-[11px] text-slate-600 leading-normal">
-          울트라월드(주)는 <strong>품질안정/위생보장</strong> 기준에 통과된 압출 성형용 PE 약품탱크 전문 제조사입니다.
+        <div className="bg-white/90 p-2.5 rounded-lg border border-orange-200/50 text-[11px] text-slate-600 leading-normal">
+          울트라 탱크의 <strong className="text-orange-600 font-extrabold">내약품성표, 규격서, 설치 및 시공 요령, 사용상 주의점</strong>을 한눈에 열람하십시오.
         </div>
-        <a
-          href="#consult"
-          onClick={(e) => {
-            e.preventDefault();
-            setCurrentTab('consult');
-          }}
-          className="flex items-center justify-between text-[11px] text-blue-900 bg-blue-100 hover:bg-blue-200 px-3 py-2 rounded-sm font-bold transition-all"
+        <button
+          onClick={onViewCatalogue}
+          className="w-full flex items-center justify-between text-[11px] text-white bg-slate-900 hover:bg-slate-850 px-3.5 py-2.5 rounded-lg font-extrabold transition-all hover:shadow-xs cursor-pointer"
         >
-          <span>신품 실시간 단가 및 도면 문의</span>
-          <ExternalLink className="w-3 h-3" />
-        </a>
+          <span>스마트 종합 카달로그 열람</span>
+          <ExternalLink className="w-3.5 h-3.5 text-orange-400" />
+        </button>
       </div>
 
     </aside>

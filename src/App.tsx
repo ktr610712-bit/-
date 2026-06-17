@@ -6,6 +6,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { PRODUCT_DATA, INITIAL_INQUIRIES } from './data';
 import { Product, Category, Inquiry } from './types';
+import { 
+  CHEMICAL_RESISTANCE_DATA, 
+  UN_KID_SPEC_DATA, 
+  CAUTION_DATA 
+} from './catalogueData';
 
 // Components
 import Header from './components/Header';
@@ -18,7 +23,7 @@ import ProductSpecsList from './components/ProductSpecsList';
 import ConsultationForm from './components/ConsultationForm';
 import Footer from './components/Footer';
 
-import { ChevronLeft, ChevronRight, Plus, X, Lock, ShieldCheck, Edit, Trash2 } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Plus, X, Lock, ShieldCheck, Edit, Trash2, BookOpen, AlertTriangle, Eye, CheckCircle2, XCircle, Info } from 'lucide-react';
 
 export default function App() {
   // Navigation & Page Tabs
@@ -47,9 +52,21 @@ export default function App() {
   const [showBadgeEditModal, setShowBadgeEditModal] = useState<boolean>(false);
   const [badgeEditTemp, setBadgeEditTemp] = useState<string>('');
 
+  // Custom Editable Main Image on Hero banner
+  const [heroImageUrl, setHeroImageUrl] = useState<string>(() => {
+    return localStorage.getItem('UW_HERO_IMAGE') || '/src/assets/images/hero_chemical_tank_1781660858614.jpg';
+  });
+  const [showImageEditModal, setShowImageEditModal] = useState<boolean>(false);
+  const [imageEditTemp, setImageEditTemp] = useState<string>('');
+
+  // Interactive Smart Catalogue States
+  const [showCatalogueModal, setShowCatalogueModal] = useState<boolean>(false);
+  const [catalogueTab, setCatalogueTab] = useState<number>(0);
+  const [chemicalSearch, setChemicalSearch] = useState<string>('');
+
   // Dual stateful DB products (saves dynamic edits locally)
   const [products, setProducts] = useState<Product[]>(() => {
-    const saved = localStorage.getItem('UW_PRODUCTS');
+    const saved = localStorage.getItem('UW_PRODUCTS_V2');
     return saved ? JSON.parse(saved) : PRODUCT_DATA;
   });
 
@@ -79,7 +96,7 @@ export default function App() {
 
   // Synchronize dynamic lists to storage
   useEffect(() => {
-    localStorage.setItem('UW_PRODUCTS', JSON.stringify(products));
+    localStorage.setItem('UW_PRODUCTS_V2', JSON.stringify(products));
   }, [products]);
 
   useEffect(() => {
@@ -93,6 +110,10 @@ export default function App() {
   useEffect(() => {
     localStorage.setItem('UW_HERO_BADGE', heroBadgeText);
   }, [heroBadgeText]);
+
+  useEffect(() => {
+    localStorage.setItem('UW_HERO_IMAGE', heroImageUrl);
+  }, [heroImageUrl]);
 
   // Admin login trigger handler
   const handleAdminTrigger = () => {
@@ -260,6 +281,18 @@ export default function App() {
     setShowBadgeEditModal(false);
   };
 
+  // Hero custom main image update submit
+  const handleOpenImageEdit = () => {
+    setImageEditTemp(heroImageUrl);
+    setShowImageEditModal(true);
+  };
+
+  const handleImageEditSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setHeroImageUrl(imageEditTemp.trim() || '/src/assets/images/hero_chemical_tank_1781660858614.jpg');
+    setShowImageEditModal(false);
+  };
+
   // Switch to contact consultation tab pre-filling a specific product
   const [prefilledQuoteProduct, setPrefilledQuoteProduct] = useState<string>('');
   
@@ -331,6 +364,8 @@ export default function App() {
           onConsultClick={() => setCurrentTab('consult')} 
           heroBadgeText={heroBadgeText}
           onEditHeroBadgeText={handleOpenBadgeEdit}
+          heroImageUrl={heroImageUrl}
+          onEditHeroImageUrl={handleOpenImageEdit}
           isAdmin={isAdmin}
         />
       )}
@@ -346,6 +381,10 @@ export default function App() {
             selectedCategory={selectedCategory}
             setSelectedCategory={setSelectedCategory}
             onScrollToSection={handleScrollToSection}
+            onViewCatalogue={() => {
+              setCatalogueTab(0);
+              setShowCatalogueModal(true);
+            }}
           />
 
           {/* Right Principal content viewport depending on current selected tab */}
@@ -637,6 +676,86 @@ export default function App() {
         </div>
       )}
 
+      {/* B-2. Hero main image editing modal */}
+      {showImageEditModal && (
+        <div className="fixed inset-0 bg-slate-950/65 flex items-center justify-center z-100 p-4 backdrop-blur-xs">
+          <div className="bg-white rounded-2xl max-w-md w-full border border-slate-200 shadow-2xl p-6 relative animate-in zoom-in-95 duration-150">
+            <button 
+              onClick={() => setShowImageEditModal(false)}
+              className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 cursor-pointer"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            <div className="space-y-1 mb-5">
+              <h3 className="font-extrabold text-slate-900 text-base flex items-center gap-1.5">
+                <Edit className="w-5 h-5 text-orange-500" />
+                상단 배너 대표 이미지 수정 및 선택
+              </h3>
+              <p className="text-slate-500 text-2xs md:text-xs">
+                메인 배너 단상에 표시될 고화질 탱크 사진 주소를 수정하거나 아래 옵션들 중에서 즉시 선택합니다.
+              </p>
+            </div>
+
+            <form onSubmit={handleImageEditSubmit} className="space-y-4">
+              <div className="space-y-1">
+                <label className="text-[11px] font-bold text-slate-600 block">이미지 파일/웹 주소 (URL)</label>
+                <input 
+                  type="text" 
+                  value={imageEditTemp}
+                  onChange={(e) => setImageEditTemp(e.target.value)}
+                  className="w-full text-xs px-3.5 py-2.5 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 font-medium font-mono"
+                  placeholder="이미지 URL을 직접 입력"
+                  required
+                />
+              </div>
+
+              {/* Quick presets for easier admin choice */}
+              <div className="space-y-1.5">
+                <span className="text-[10px] font-extrabold text-slate-500 uppercase tracking-wider block">샘플 프리셋 디자인 선택</span>
+                <div className="grid grid-cols-2 gap-2">
+                  {[
+                    { label: 'UG 오렌지형', url: '/src/assets/images/hero_chemical_tank_1781660858614.jpg' },
+                    { label: 'UG 표준 청색형', url: '/src/assets/images/ug_standard_tank_1781660874171.jpg' },
+                    { label: 'UD 완전배출형', url: '/src/assets/images/ud_drainage_tank_1781660890538.jpg' },
+                    { label: 'UN형 밀폐교반형', url: '/src/assets/images/un_agitation_tank_1781660904203.jpg' },
+                  ].map((preset, index) => (
+                    <button
+                      key={index}
+                      type="button"
+                      onClick={() => setImageEditTemp(preset.url)}
+                      className={`p-2 border text-left rounded-lg text-2xs transition-all cursor-pointer ${
+                        imageEditTemp === preset.url 
+                          ? 'border-orange-500 bg-orange-50/50 text-orange-700 font-bold' 
+                          : 'border-slate-200 hover:border-slate-350 text-slate-600'
+                      }`}
+                    >
+                      {preset.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="flex gap-2 justify-end pt-2">
+                <button 
+                  type="button"
+                  onClick={() => setShowImageEditModal(false)}
+                  className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-lg text-2xs font-extrabold cursor-pointer"
+                >
+                  취소
+                </button>
+                <button 
+                  type="submit"
+                  className="px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg text-2xs font-extrabold cursor-pointer"
+                >
+                  대표사진 저장
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
       {/* C. Dynamic Product Register & Modifier Modal */}
       {showProductFormModal && (
         <div className="fixed inset-0 bg-slate-950/65 flex items-center justify-center z-100 p-4 backdrop-blur-xs overflow-y-auto">
@@ -817,6 +936,460 @@ export default function App() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* D. Interactive Smart Catalogue Viewer Modal */}
+      {showCatalogueModal && (
+        <div className="fixed inset-0 bg-slate-950/75 flex items-center justify-center z-100 p-4 backdrop-blur-xs overflow-y-auto">
+          <div className="bg-white rounded-3xl max-w-4xl w-full border border-slate-200 shadow-2xl overflow-hidden relative flex flex-col max-h-[90vh] animate-in zoom-in-95 duration-150">
+            
+            {/* Header section */}
+            <div className="bg-slate-900 text-white p-5 md:p-6 border-b border-slate-950 flex items-center justify-between shrink-0">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-orange-500 flex items-center justify-center">
+                  <BookOpen className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <h3 className="font-extrabold text-base md:text-lg flex items-center gap-2">
+                    울트라월드 주식회사 종합 스마트 카달로그
+                  </h3>
+                  <p className="text-[10px] text-slate-400 font-mono uppercase tracking-widest">
+                    Ultra Chemical Tank Official Digital Brochure (5-Page System)
+                  </p>
+                </div>
+              </div>
+              <button 
+                onClick={() => setShowCatalogueModal(false)}
+                className="text-slate-400 hover:text-white bg-slate-800 hover:bg-slate-750 p-2 rounded-full transition-all cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Navigation tabs inside the sheet */}
+            <div className="bg-slate-50 border-b border-slate-200 p-2 md:px-6 md:py-3 overflow-x-auto flex items-center gap-1.5 scrollbar-thin shrink-0">
+              {[
+                { title: '1. 카달로그 표지', icon: BookOpen },
+                { title: '2. UG 일반형 규격표', icon: Eye },
+                { title: '3. 정밀 내약품성 사전', icon: ShieldCheck },
+                { title: '4. 교반형 규격표', icon: Info },
+                { title: '5. 설치 보강 주의사항', icon: AlertTriangle },
+              ].map((tab, idx) => {
+                const isActive = catalogueTab === idx;
+                const TabIcon = tab.icon;
+                return (
+                  <button
+                    key={idx}
+                    onClick={() => setCatalogueTab(idx)}
+                    className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-bold whitespace-nowrap transition-all cursor-pointer ${
+                      isActive 
+                        ? 'bg-orange-500 text-white shadow-xs' 
+                        : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                    }`}
+                  >
+                    <TabIcon className="w-3.5 h-3.5" />
+                    <span>{tab.title}</span>
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Content viewbody viewport (scrollable area) */}
+            <div className="p-6 overflow-y-auto flex-1 min-h-0 bg-slate-50/20">
+              
+              {/* PAGE 1: COVER PAGE HERO */}
+              {catalogueTab === 0 && (
+                <div className="space-y-6 animate-in fade-in duration-200">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center bg-slate-900 text-white rounded-2xl p-6 md:p-8 border border-slate-950 shadow-md">
+                    <div className="space-y-4">
+                      <span className="text-[10px] font-bold text-orange-400 uppercase tracking-widest border border-orange-500/30 px-2 py-0.5 rounded-full bg-orange-950/35">
+                        Brand Premium Brochure Cover
+                      </span>
+                      <h4 className="text-2xl md:text-3xl font-black tracking-tight leading-snug">
+                        ULTRA CHEMICAL <span className="text-orange-500">TANK</span>
+                      </h4>
+                      <p className="text-slate-400 text-xs leading-relaxed">
+                        We'll be near you all the way for advanced technology and customer satisfaction.
+                      </p>
+                      <div className="h-[2px] bg-gradient-to-r from-orange-500 to-transparent w-32" />
+                      <div className="space-y-2 text-2xs md:text-xs">
+                        <p className="text-slate-300">● <strong>제조원:</strong> 울트라월드 주식회사 (ULTRA WORLD CO., Ltd)</p>
+                        <p className="text-slate-300">● <strong>온라인 도메인:</strong> www.ultratank.co.kr</p>
+                        <p className="text-slate-300">● <strong>주 생산제:</strong> 폴리에틸렌 보강식 케미칼 저장탱크 전문</p>
+                      </div>
+                    </div>
+                    {/* Visual representative tank */}
+                    <div className="relative rounded-xl overflow-hidden border-4 border-slate-850 h-64 shadow-2xl bg-slate-800">
+                      <img 
+                        src="/src/assets/images/catalogue_hero_image_1781672372152.jpg" 
+                        alt="울트라 화학 탱크 대표" 
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="bg-white p-4 rounded-xl border border-slate-200 space-y-1">
+                      <h5 className="font-extrabold text-xs text-slate-800">100% 무독성 소재</h5>
+                      <p className="text-[11px] text-slate-500">압출 성형 전용 최고급 LLDPE/HDPE 정품 레진만을 사용하여 냄새와 유해성 걱정이 없습니다.</p>
+                    </div>
+                    <div className="bg-white p-4 rounded-xl border border-slate-200 space-y-1">
+                      <h5 className="font-extrabold text-xs text-slate-800">다양한 옵션 호환</h5>
+                      <p className="text-[11px] text-slate-500">PVC, PE 플랜지 노즐, 아크릴 투명 수위계 및 교반 프롬데크와 STS 보강 밴드 체결까지 맞춤 제공.</p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* PAGE 2: UG SPEC PROTOCOL */}
+              {catalogueTab === 1 && (
+                <div className="space-y-4 animate-in fade-in duration-200">
+                  <div className="bg-orange-50 p-4 border border-orange-200 rounded-xl flex items-start gap-3">
+                    <Info className="w-5 h-5 text-orange-600 shrink-0 mt-0.5" />
+                    <div>
+                      <h4 className="font-bold text-xs text-orange-950">UG형(일반형) 오렌지 밴딩 울트라 탱크 규격표</h4>
+                      <p className="text-[11px] text-orange-800 leading-normal">
+                        수평 가설대 및 평판 콘크리트 몰탈 바닥 위에 안심 고정하는 최다 판매 시그니처 형상 규격표입니다. 
+                        오렌지 및 블랙 탱크 컬러 선택이 가능하며, 계량 및 벤팅 홀, 레벨 게이지 안전 장치가 매칭됩니다.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="overflow-x-auto border border-slate-150 rounded-xl bg-white shadow-2xs">
+                    <table className="w-full text-left border-collapse text-[11px]">
+                      <thead>
+                        <tr className="bg-slate-100 text-slate-700 font-extrabold border-b border-slate-200">
+                          <th className="p-2.5">모델구분</th>
+                          <th className="p-2.5">호칭 용량 (L)</th>
+                          <th className="p-2.5">외경 (Ø, mm)</th>
+                          <th className="p-2.5">수면고 (E, mm)</th>
+                          <th className="p-2.5">노즐고 (D, mm)</th>
+                          <th className="p-2.5">전고 (C, mm)</th>
+                          <th className="p-2.5">안전 두께 (t)</th>
+                          <th className="p-2.5 text-center">도면견적</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-100 font-mono text-slate-600">
+                        {[
+                          { model: 'UG-30000', capacity: '30,000 L', diameter: '2,800', water: '5,100', nozzle: '5,420', height: '5,670', thickness: '15' },
+                          { model: 'UG-20000', capacity: '20,000 L', diameter: '2,800', water: '3,500', nozzle: '3,780', height: '3,980', thickness: '13~15' },
+                          { model: 'UG-15000', capacity: '15,000 L', diameter: '2,570', water: '3,100', nozzle: '3,350', height: '3,600', thickness: '12~14' },
+                          { model: 'UG-10000', capacity: '10,000 L', diameter: '2,340', water: '2,430', nozzle: '2,780', height: '3,060', thickness: '12~14' },
+                          { model: 'UG-8000',  capacity: '8,000 L',  diameter: '2,110', water: '2,400', nozzle: '2,770', height: '3,000', thickness: '12~14' },
+                          { model: 'UG-6000',  capacity: '6,000 L',  diameter: '1,900', water: '2,270', nozzle: '2,600', height: '2,870', thickness: '10~12' },
+                          { model: 'UG-5000',  capacity: '5,000 L',  diameter: '1,880', water: '1,900', nozzle: '2,210', height: '2,430', thickness: '7~9' },
+                          { model: 'UG-4000',  capacity: '4,000 L',  diameter: '1,710', water: '1,840', nozzle: '2,150', height: '2,380', thickness: '7~9' },
+                          { model: 'UG-3000',  capacity: '3,000 L',  diameter: '1,535', water: '1,640', nozzle: '1,820', height: '2,080', thickness: '6~8' },
+                          { model: 'UG-2000',  capacity: '2,000 L',  diameter: '1,380', water: '1,410', nozzle: '1,570', height: '1,760', thickness: '5~6' },
+                          { model: 'UG-1500',  capacity: '1,500 L',  diameter: '1,240', water: '1,290', nozzle: '1,520', height: '1,700', thickness: '5~6' },
+                          { model: 'UG-1000',  capacity: '1,000 L',  diameter: '1,095', water: '1,130', nozzle: '1,280', height: '1,430', thickness: '4~6' },
+                          { model: 'UG-800',   capacity: '800 L',   diameter: '990',   water: '1,120', nozzle: '1,320', height: '1,450', thickness: '4~6' },
+                          { model: 'UG-600',   capacity: '600 L',   diameter: '925',   water: '940',   nozzle: '1,040', height: '1,180', thickness: '4~5' },
+                          { model: 'UG-400',   capacity: '400 L',   diameter: '840',   water: '825',   nozzle: '895',   height: '1,050', thickness: '4~5' },
+                          { model: 'UG-200',   capacity: '200 L',   diameter: '650',   water: '650',   nozzle: '740',   height: '850',   thickness: '3~4' },
+                        ].map((row) => (
+                          <tr key={row.model} className="hover:bg-slate-50 transition-colors">
+                            <td className="p-2 font-extrabold text-slate-800">{row.model}</td>
+                            <td className="p-2">{row.capacity}</td>
+                            <td className="p-2">{row.diameter}</td>
+                            <td className="p-2">{row.water}</td>
+                            <td className="p-2">{row.nozzle}</td>
+                            <td className="p-2">{row.height}</td>
+                            <td className="p-2 font-bold text-orange-600">{row.thickness}t</td>
+                            <td className="p-2 text-center">
+                              <button 
+                                onClick={() => {
+                                  setShowCatalogueModal(false);
+                                  setPrefilledQuoteProduct(`UG일반형 ${row.model} (${row.capacity})`);
+                                  setCurrentTab('consult');
+                                }}
+                                className="bg-slate-900 text-white font-extrabold px-1.5 py-1 rounded text-[9px] hover:bg-orange-500 hover:text-white cursor-pointer transition-all"
+                              >
+                                문의
+                              </button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
+
+              {/* PAGE 3: CHEMICAL RESISTANCE DICTIONARY */}
+              {catalogueTab === 2 && (
+                <div className="space-y-4 animate-in fade-in duration-200">
+                  <div className="bg-amber-50/50 p-4 border border-amber-200 rounded-xl space-y-1">
+                    <h4 className="font-extrabold text-xs text-amber-950 flex items-center gap-2">
+                      <ShieldCheck className="w-4 h-4 text-amber-600" />
+                      실시간 대화형 울트라 탱크 내약품성(Chemical Resistance) 일람표
+                    </h4>
+                    <p className="text-[11px] text-slate-600 leading-normal">
+                      아래 검색창에 화학약품의 한글명 또는 화학 기호를 쓰시면 안심 보관 여부가 실시간 검색됩니다. 
+                      기본 폴리에틸렌 재질과 탱크 성형 반응 여부를 미리 판정하실 수 있습니다.
+                    </p>
+                  </div>
+
+                  {/* Chemical Search Engine Box */}
+                  <div className="relative">
+                    <input 
+                      type="text"
+                      className="w-full px-4 py-3 pl-11 text-xs border border-slate-250 bg-white rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 font-medium"
+                      placeholder="자주 쓰는 화학 물질 입력 (예: 염산, 황산, NaOH, 불산, 초산 등)..."
+                      value={chemicalSearch}
+                      onChange={(e) => setChemicalSearch(e.target.value)}
+                    />
+                    <div className="absolute left-4 top-3 text-slate-400">
+                      <Eye className="w-4 h-4" />
+                    </div>
+                    {chemicalSearch && (
+                      <button 
+                        onClick={() => setChemicalSearch('')}
+                        className="absolute right-4 top-3 text-slate-400 hover:text-slate-600 font-extrabold text-xs cursor-pointer"
+                      >
+                        지우기
+                      </button>
+                    )}
+                  </div>
+
+                  {/* Dictionary Grid */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5 max-h-96 overflow-y-auto pr-1">
+                    {CHEMICAL_RESISTANCE_DATA.filter((rec) => {
+                      const query = chemicalSearch.toLowerCase().trim();
+                      return !query || 
+                             rec.name.toLowerCase().includes(query) || 
+                             rec.formula.toLowerCase().includes(query) || 
+                             rec.concentration.toLowerCase().includes(query);
+                    }).map((rec, index) => {
+                      
+                      const getResBadge = (val: string) => {
+                        if (val === 'GOOD') {
+                          return (
+                            <span className="inline-flex items-center gap-1 font-extrabold px-2 py-0.5 rounded text-[10px] bg-green-50 text-green-700 border border-green-200">
+                              <CheckCircle2 className="w-3.5 h-3.5 text-green-600" /> 양호 (◯)
+                            </span>
+                          );
+                        }
+                        if (val === 'OK') {
+                          return (
+                            <span className="inline-flex items-center gap-1 font-extrabold px-2 py-0.5 rounded text-[10px] bg-amber-50 text-amber-700 border border-amber-200">
+                              <Info className="w-3.5 h-3.5 text-amber-600" /> 제한적 (△)
+                            </span>
+                          );
+                        }
+                        if (val === 'BAD') {
+                          return (
+                            <span className="inline-flex items-center gap-1 font-extrabold px-2 py-0.5 rounded text-[10px] bg-rose-50 text-rose-700 border border-rose-200">
+                              <XCircle className="w-3.5 h-3.5 text-rose-600" /> 비장착 (✕)
+                            </span>
+                          );
+                        }
+                        return (
+                          <span className="inline-flex items-center gap-1 font-extrabold px-2 py-0.5 rounded text-[10px] bg-orange-50 text-orange-700 border border-orange-200">
+                            유의 (E)
+                          </span>
+                        );
+                      };
+
+                      return (
+                        <div key={index} className="bg-white rounded-xl border border-slate-200 p-4 hover:border-orange-200 hover:shadow-2xs transition-all flex flex-col justify-between space-y-2">
+                          <div className="flex justify-between items-start gap-4">
+                            <div>
+                              <h5 className="font-extrabold text-xs text-slate-900">{rec.name}</h5>
+                              <p className="text-[10px] text-slate-505 font-mono">기호: {rec.formula} | 한계농도: {rec.concentration}</p>
+                            </div>
+                            <span className="text-[10px] bg-slate-10 w-8 text-center text-slate-400 px-1 py-0.5 border border-slate-150 rounded font-mono">No. {index+1}</span>
+                          </div>
+                          
+                          <div className="grid grid-cols-2 gap-2 bg-slate-50 p-2 rounded-lg text-[10px]">
+                            <div className="flex justify-between items-center px-1">
+                              <span className="text-slate-500">20℃ 상온 보관</span>
+                              {getResBadge(rec.res20)}
+                            </div>
+                            <div className="flex justify-between items-center px-1 border-l border-slate-200">
+                              <span className="text-slate-505">60℃ 고온 한계</span>
+                              {getResBadge(rec.res60)}
+                            </div>
+                          </div>
+
+                          <p className="text-[10px] text-slate-500 leading-normal bg-slate-100/50 p-1.5 rounded text-left">
+                            <strong>전문 소견:</strong> {rec.note}
+                          </p>
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  <p className="text-[10px] text-slate-400 leading-normal text-center bg-slate-50 p-3 rounded-lg border border-slate-150">
+                    ※ 기재되지 않은 특수 혼합 약액(도금 폐수, 유기 용제 복합액)의 담수 지탱 여부는 울트라월드 정밀 기술 설계부(<strong>010-3887-6107</strong>)에 화학 조성을 전달 주시면 정밀한 계산값을 메일로 발송해 드립니다.
+                  </p>
+                </div>
+              )}
+
+              {/* PAGE 4: UN / KID AGITATION SMALL SPEC */}
+              {catalogueTab === 3 && (
+                <div className="space-y-4 animate-in fade-in duration-200">
+                  <div className="bg-slate-900 text-white rounded-xl p-5 border border-slate-950 space-y-1.5 shadow-sm">
+                    <h4 className="font-extrabold text-xs text-orange-400">UN형 / KID형 울트라 약정량 소형탱크 규격표</h4>
+                    <p className="text-[11px] text-slate-300 leading-relaxed">
+                      상부 구동 전기 기어모터 교반 지탱 프레임 가설대 장착에 안심 대응 설계된 교반 전용 소형 탱크 군입니다. 
+                      각종 도징(Dosing) 및 수처리 중화 가동 반응 용도로 장기 안심 수납 대응합니다.
+                    </p>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
+                    <div className="overflow-x-auto border border-slate-150 rounded-xl bg-white shadow-2xs">
+                      <table className="w-full text-left border-collapse text-[11px]">
+                        <thead>
+                          <tr className="bg-slate-100 text-slate-700 font-extrabold border-b border-slate-200">
+                            <th className="p-3">품명 (Model)</th>
+                            <th className="p-3">용량 (L)</th>
+                            <th className="p-3">외경 (mm)</th>
+                            <th className="p-3">전고 (mm)</th>
+                            <th className="p-3">두께 (t)</th>
+                            <th className="p-3 text-center">도면견적</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-100 font-mono text-slate-600">
+                          {UN_KID_SPEC_DATA.map((rec) => (
+                            <tr key={rec.model} className="hover:bg-slate-50 transition-colors">
+                              <td className="p-3 font-extrabold text-slate-800">{rec.model}</td>
+                              <td className="p-3 font-bold text-slate-900">{rec.capacity}</td>
+                              <td className="p-3">{rec.diameter}</td>
+                              <td className="p-3">{rec.height}</td>
+                              <td className="p-3 text-orange-600 font-bold">{rec.thickness}mm</td>
+                              <td className="p-3 text-center">
+                                <button 
+                                  onClick={() => {
+                                    setShowCatalogueModal(false);
+                                    setPrefilledQuoteProduct(`소형교반형 ${rec.model} (${rec.capacity})`);
+                                    setCurrentTab('consult');
+                                  }}
+                                  className="bg-slate-900 text-white font-extrabold px-1.5 py-1 rounded text-[9px] hover:bg-orange-500 cursor-pointer transition-all"
+                                >
+                                  전송문의
+                                </button>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+
+                    <div className="space-y-3">
+                      <div className="bg-white rounded-xl border border-slate-200 p-4 space-y-2">
+                        <h5 className="font-extrabold text-xs text-slate-900 flex items-center gap-1.5">
+                          <CheckCircle2 className="w-4 h-4 text-orange-500" /> UN형 (원형 소화조 장탈형)
+                        </h5>
+                        <p className="text-[11px] text-slate-500 leading-normal">
+                          상부에 안전 점검용 스크류 뚜껑(Manhole) 및 모터 구동 지지 플레이트를 취부 성형하여 흔들림과 진동 자극을 기하학적으로 극소화하였습니다.
+                        </p>
+                      </div>
+                      <div className="bg-white rounded-xl border border-slate-200 p-4 space-y-2">
+                        <h5 className="font-extrabold text-xs text-slate-900 flex items-center gap-1.5">
+                          <CheckCircle2 className="w-4 h-4 text-orange-500" /> KID형 (사각 도징 컴팩트형)
+                        </h5>
+                        <p className="text-[11px] text-slate-500 leading-normal">
+                          정사각형 가로 형률 구조로 협소한 기계실, 수처리 배관 지하실 협로 통과가 지극히 간편하며 안정적으로 다단 배치가 완성됩니다.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* PAGE 5: STRUCTURAL / SETUP CAUTION DETAILS */}
+              {catalogueTab === 4 && (
+                <div className="space-y-4 animate-in fade-in duration-200">
+                  <div className="bg-rose-50 text-rose-950 rounded-xl p-4 border border-rose-200 flex items-start gap-3">
+                    <AlertTriangle className="w-5 h-5 text-rose-600 shrink-0 mt-0.5 animate-bounce" />
+                    <div>
+                      <h4 className="font-bold text-xs text-rose-950">울트라 탱크 안심 설치 공사 및 사용상의 핵심 주의사항</h4>
+                      <p className="text-[11px] text-rose-800 leading-normal">
+                        폴리에틸렌 케미칼 탱크는 성형 가공 후 충격과 온도 유의점을 정확하게 지키실 때 반영구적(평생 수명) 안심 동작이 보장됩니다.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {/* Column A: Rules list */}
+                    <div className="space-y-3">
+                      <div className="bg-white p-4 rounded-xl border border-slate-200 space-y-2">
+                        <h5 className="font-extrabold text-xs text-slate-900 border-b border-slate-100 pb-1 flex items-center gap-1.5">
+                          <span className="w-1.5 h-1.5 bg-orange-500 rounded-full" /> 구조 및 온도 주의사항 (Structure)
+                        </h5>
+                        <ul className="text-[11px] text-slate-600 space-y-1.5 list-disc pl-4 leading-normal">
+                          {CAUTION_DATA.structural.map((item, id) => (
+                            <li key={id}>{item}</li>
+                          ))}
+                        </ul>
+                      </div>
+
+                      <div className="bg-white p-4 rounded-xl border border-slate-200 space-y-2">
+                        <h5 className="font-extrabold text-xs text-slate-900 border-b border-slate-100 pb-1 flex items-center gap-1.5">
+                          <span className="w-1.5 h-1.5 bg-orange-500 rounded-full" /> 운반 상의 대책 가이드 (Logistics)
+                        </h5>
+                        <ul className="text-[11px] text-slate-600 space-y-1.5 list-disc pl-4 leading-normal">
+                          {CAUTION_DATA.logistics.map((item, id) => (
+                            <li key={id}>{item}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    </div>
+
+                    {/* Column B: Rules list and layout drawings */}
+                    <div className="space-y-3">
+                      <div className="bg-white p-4 rounded-xl border border-slate-200 space-y-2">
+                        <h5 className="font-extrabold text-xs text-slate-900 border-b border-slate-100 pb-1 flex items-center gap-1.5">
+                          <span className="w-1.5 h-1.5 bg-orange-500 rounded-full" /> 설치 시공 바닥 설치 기준 (Installation)
+                        </h5>
+                        <ul className="text-[11px] text-slate-600 space-y-1.5 list-disc pl-4 leading-normal">
+                          {CAUTION_DATA.setup.map((item, id) => (
+                            <li key={id}>{item}</li>
+                          ))}
+                        </ul>
+                      </div>
+
+                      {/* Visual Drawing representations */}
+                      <div className="bg-slate-900 rounded-xl p-4 text-white space-y-2 text-2xs font-mono">
+                        <h5 className="text-orange-400 font-extrabold text-xs">설치 기초도 안전 가이드 (도식 요약)</h5>
+                        
+                        <div className="grid grid-cols-2 gap-3 text-center border-t border-slate-800 pt-2 shrink-0">
+                          <div className="bg-slate-850 p-2 rounded border border-green-500/30">
+                            <span className="text-green-500 font-bold block mb-1">◯ 양호 기초대</span>
+                            <div className="border-t border-slate-500 w-12 mx-auto my-1" />
+                            <p className="text-slate-400 text-[10px]">콘크리트 평평한 면 또는 평판 완비 철제</p>
+                          </div>
+                          <div className="bg-slate-850 p-2 rounded border border-red-500/30">
+                            <span className="text-red-500 font-bold block mb-1">✕ 부실 기초대</span>
+                            <div className="border-t border-dashed border-red-500 w-12 mx-auto my-1" />
+                            <p className="text-slate-400 text-[10px]">L형강 등 하부 평판 없이 탱크 부양 안됨</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+            </div>
+
+            {/* Footer action button inside the sheet */}
+            <div className="bg-slate-100 p-4 border-t border-slate-200 gap-3 flex justify-between items-center shrink-0">
+              <span className="text-[10px] md:text-2xs text-slate-500 font-bold">
+                ⓒ 울트라월드 주식회사 기술 데이터베이스 (Tel: 010-3887-6107)
+              </span>
+              <div className="flex gap-2">
+                <button 
+                  onClick={() => setShowCatalogueModal(false)}
+                  className="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-lg text-2xs font-extrabold cursor-pointer"
+                >
+                  카달로그 닫기
+                </button>
+              </div>
+            </div>
+
           </div>
         </div>
       )}

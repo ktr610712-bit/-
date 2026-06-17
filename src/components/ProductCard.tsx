@@ -90,24 +90,12 @@ export default function ProductCard({
       {/* Corporate spec brief */}
       <div className="p-4 flex flex-col flex-grow justify-between space-y-3.5">
         <div className="space-y-1.5">
-          <p className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">
-            {product.specs.model}
-          </p>
-          <h3 className="font-bold text-sm text-slate-800 tracking-tight line-clamp-2 group-hover:text-blue-600 transition-colors">
-            {product.name}
+          <h3 className="font-extrabold text-sm text-slate-800 tracking-tight line-clamp-2 group-hover:text-amber-600 transition-colors">
+            {product.category === 'UG_STANDARD' ? 'PE 케미칼탱크 UG 일반형' :
+             product.category === 'UD_DISCHARGE' ? 'PE 케미칼탱크 UD 완전배출형' :
+             product.category === 'UN_AGITATION' ? 'PE 케미칼탱크 UN/KID 교반형' :
+             product.category === 'DECK_STS' ? 'PE 케미칼탱크 DECK형 / STS밴드형' : product.name}
           </h3>
-          
-          {/* Key dimensions and capacity */}
-          <div className="grid grid-cols-2 gap-1.5 pt-2 border-t border-slate-100 text-[11px] text-slate-500">
-            <div>
-              <span className="text-[9px] text-slate-400 block uppercase">저장 용량</span>
-              <strong className="text-slate-700 font-semibold">{product.capacity}</strong>
-            </div>
-            <div>
-              <span className="text-[9px] text-slate-400 block uppercase">외경 규격</span>
-              <strong className="text-slate-700 font-semibold">{product.dimensions}</strong>
-            </div>
-          </div>
         </div>
 
         {/* Price & Action inquiry row */}

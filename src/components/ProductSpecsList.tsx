@@ -66,8 +66,7 @@ export default function ProductSpecsList({ onQuoteClick, onViewProductDetails }:
             </div>
           </div>
           <p className="text-slate-300 text-xs mt-3 leading-relaxed max-w-2xl">
-            울트라월드 주식회사의 자체 공장에서 직접 다이 성형 제조하는 주력 모델식 UG 일반형 케미칼 탱크 스펙 시트입니다. 
-            용도로는 강산 약품 저장, 수처리 폐수 정량 투입, 알칼리 전기도금액 중화 탱크 등이 있습니다.
+            울트라월드 주식회사주력 모델식 UG 일반형 케미칼 탱크 스펙 시트입니다.
           </p>
         </div>
 
@@ -112,7 +111,6 @@ export default function ProductSpecsList({ onQuoteClick, onViewProductDetails }:
                 <th className="p-4">탱크 외경 (Ø)</th>
                 <th className="p-4">탱크 높이 (H)</th>
                 <th className="p-4">권장 기본 두께</th>
-                <th className="p-4">기본 보강 밴딩 사양</th>
                 <th className="p-4 text-center">도면견적</th>
               </tr>
             </thead>
@@ -130,12 +128,6 @@ export default function ProductSpecsList({ onQuoteClick, onViewProductDetails }:
                     <td className="p-4 font-mono">{row.diameter}</td>
                     <td className="p-4 font-mono">{row.height}</td>
                     <td className="p-4 font-mono text-slate-700">{row.thickness}</td>
-                    <td className="p-4">
-                      <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 font-bold text-[10px]">
-                        <span className="w-1.5 h-1.5 bg-orange-500 rounded-full" />
-                        {row.bandCount}
-                      </span>
-                    </td>
                     <td className="p-4 text-center">
                       <button
                         onClick={() => onQuoteClick(`${row.model} (${row.capacity})`)}
@@ -148,7 +140,7 @@ export default function ProductSpecsList({ onQuoteClick, onViewProductDetails }:
                 ))
               ) : (
                 <tr>
-                  <td colSpan={7} className="p-8 text-center text-slate-400">
+                  <td colSpan={6} className="p-8 text-center text-slate-400">
                     지정된 검색 조건에 해당하는 수치 규격 모델이 존재하지 않습니다.
                   </td>
                 </tr>
@@ -159,37 +151,20 @@ export default function ProductSpecsList({ onQuoteClick, onViewProductDetails }:
       </section>
 
       {/* 2. Extra Quality Notice / Advisory details */}
-      <section className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        
-        <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 space-y-4">
-          <h4 className="font-extrabold text-slate-900 text-sm flex items-center gap-2">
-            <Sparkles className="w-4.5 h-4.5 text-amber-500 animate-pulse" />
-            울트라월드 특별 공급 옵션 안내
-          </h4>
-          <p className="text-slate-600 text-xs leading-relaxed">
-            저희 울트라월드(주)는 공정 장비 설계에 완벽하게 부합될 수 있도록 다음과 같은 피팅 부속 조율 서비스와 성형 타공 가공을 납품 전 논의 완료해 드립니다.
-          </p>
-          <ul className="text-xs text-slate-500 space-y-2 pl-4 list-disc">
-            <li><strong>주요 피팅 노즐:</strong> PVC, PE, SUS 플랜지 (25A, 40A, 50A, 80A, 100A 자재 보유)</li>
-            <li><strong>수위계 옵션:</strong> 투명 아크릴 튜브 수위계, 마그네틱 플로트 레벨게이지 맞춤 조립</li>
-            <li><strong>안전 데크 통로:</strong> 지면 기초가 취약한 공장의 경우 스탠드 프레임 일체 성출</li>
-          </ul>
-        </div>
-
-        <div className="bg-slate-950 text-slate-100 rounded-2xl shadow-sm p-6 flex flex-col justify-between">
-          <div className="space-y-3">
-            <span className="text-[9px] font-bold text-amber-400 uppercase tracking-widest block">기술 엔지니어 전담 서비스</span>
-            <h4 className="font-extrabold text-white text-sm">원하는 맞춤형 크기와 성형이 있으신가요?</h4>
+      <section className="w-full">
+        <div className="bg-slate-950 text-slate-100 rounded-2xl shadow-sm p-6 md:p-8 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+          <div className="space-y-2.5 max-w-3xl">
+            <span className="text-[10px] font-bold text-amber-500 uppercase tracking-widest block">기술 엔지니어 전담 서비스</span>
+            <h4 className="font-extrabold text-white text-base md:text-lg">원하는 맞춤형 크기와 성형이 있으신가요?</h4>
             <p className="text-slate-300 text-xs leading-relaxed">
               위의 기성 모델 이외의 완벽 배출(UD) Conical 바닥 탱크, 이중 단열 보온 수조, 혹은 고점도 약품 전용 교반 모터 기어 스펙은 사내 기술 고문이 직접 가설 견적 설계 해드립니다.
             </p>
           </div>
-          <div className="bg-slate-900 px-4 py-3 rounded-lg border border-slate-800 flex items-center justify-between text-xs font-bold text-slate-300 mt-4">
+          <div className="bg-slate-900 px-5 py-4 rounded-xl border border-slate-800 flex flex-col sm:flex-row sm:items-center gap-3 text-xs font-bold text-slate-300 shrink-0">
             <span>직통 기술 설계 연구부:</span>
-            <span className="text-amber-400 font-extrabold">010-3887-6107</span>
+            <span className="text-amber-400 text-base font-black">010-3887-6107</span>
           </div>
         </div>
-
       </section>
 
     </div>
