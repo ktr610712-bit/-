@@ -117,7 +117,7 @@ export default function App() {
       setShowLoginModal(false);
       setLoginError('');
     } else {
-      setLoginError('아이디 또는 비밀번호가 올바르지 않습니다. (ID: ultfine)');
+      setLoginError('아이디 또는 비밀번호가 올바르지 않습니다.');
     }
   };
 
@@ -549,7 +549,7 @@ export default function App() {
                   type="text" 
                   value={loginId}
                   onChange={(e) => setLoginId(e.target.value)}
-                  placeholder="아이디를 입력하세요 (ultfine)"
+                  placeholder="아이디를 입력하세요"
                   className="w-full text-xs px-3.5 py-2.5 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 font-medium"
                   required
                 />
@@ -561,7 +561,7 @@ export default function App() {
                   type="password" 
                   value={loginPw}
                   onChange={(e) => setLoginPw(e.target.value)}
-                  placeholder="비밀번호를 입력하세요 (ult269612!)"
+                  placeholder="비밀번호를 입력하세요"
                   className="w-full text-xs px-3.5 py-2.5 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 font-medium"
                   required
                 />
