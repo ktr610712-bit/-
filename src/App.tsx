@@ -54,7 +54,7 @@ export default function App() {
 
   // Custom Editable Main Image on Hero banner
   const [heroImageUrl, setHeroImageUrl] = useState<string>(() => {
-    return localStorage.getItem('UW_HERO_IMAGE') || '/src/assets/images/hero_chemical_tank_1781660858614.jpg';
+    return localStorage.getItem('UW_HERO_IMAGE') || '/src/assets/images/home_orange_ring_tank_1781673633078.jpg';
   });
   const [showImageEditModal, setShowImageEditModal] = useState<boolean>(false);
   const [imageEditTemp, setImageEditTemp] = useState<string>('');
@@ -408,59 +408,6 @@ export default function App() {
                   </div>
                 )}
 
-                {/* ① 주요제품 (Featured Slider section) */}
-                {!searchQuery && (
-                  <section className="space-y-4" id="featured-showcase">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <h2 className="text-lg md:text-xl font-bold text-slate-900 tracking-tight flex items-center gap-2" id="product-showroom-title">
-                          <span className="w-1 h-5 bg-blue-600 rounded-full shrink-0"></span>
-                          주요 대표 제품 안내
-                        </h2>
-                      </div>
-
-                      {/* Slider Navigation controllers */}
-                      <div className="flex items-center gap-1.5">
-                        <button
-                          onClick={() => scrollSlider('LEFT')}
-                          className="w-8 h-8 rounded-full border border-slate-200 bg-white hover:bg-slate-50 active:bg-slate-100 flex items-center justify-center text-slate-600 transition-colors shadow-2xs cursor-pointer"
-                          aria-label="이전 제품 보기"
-                        >
-                          <ChevronLeft className="w-5 h-5" />
-                        </button>
-                        <button
-                          onClick={() => scrollSlider('RIGHT')}
-                          className="w-8 h-8 rounded-full border border-slate-200 bg-white hover:bg-slate-50 active:bg-slate-100 flex items-center justify-center text-slate-600 transition-colors shadow-2xs cursor-pointer"
-                          aria-label="다음 제품 보기"
-                        >
-                          <ChevronRight className="w-5 h-5" />
-                        </button>
-                      </div>
-                    </div>
-
-                    {/* Horizontal scrollable box container */}
-                    <div 
-                      ref={sliderRef}
-                      className="flex gap-4 overflow-x-auto scroll-smooth pb-4 no-scrollbar [-ms-overflow-style:none] [scrollbar-width:none] snap-x snap-mandatory"
-                    >
-                      {featuredProducts.map((prod) => (
-                        <div 
-                          key={`feat-${prod.id}`}
-                          className="w-72 shrink-0 snap-start"
-                        >
-                          <ProductCard 
-                            product={prod} 
-                            onViewDetails={(p) => setSelectedProduct(p)} 
-                            isAdmin={isAdmin}
-                            onEditProduct={handleOpenProductEdit}
-                            onDeleteProduct={handleDeleteProduct}
-                          />
-                        </div>
-                      ))}
-                    </div>
-                  </section>
-                )}
-
                 {/* ② 일반제품 Grid (4-column layout) */}
                 <section className="space-y-5">
                   <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -468,7 +415,7 @@ export default function App() {
                       <h2 className="text-lg md:text-xl font-bold text-slate-900 tracking-tight flex items-center gap-2">
                         <span className="w-1 h-5 bg-blue-600 rounded-full shrink-0"></span>
                         {selectedCategory === 'ALL' 
-                          ? '일반제품 전체 목록' 
+                          ? '주요 제품 목록' 
                           : `${products.find(p => p.category === selectedCategory)?.categoryName || '해당 카테고리'} 목록`
                         }
                       </h2>

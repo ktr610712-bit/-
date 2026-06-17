@@ -101,23 +101,6 @@ export default function Hero({ onConsultClick, heroBadgeText, onEditHeroBadgeTex
               <span className="absolute top-8 bg-orange-650/90 text-white font-black text-[9px] tracking-widest px-3 py-1 rounded shadow uppercase">
                 PE CHEMICAL TANK
               </span>
-              
-              {/* Bottom label overlay */}
-              <div className="absolute bottom-6 left-4 right-4 text-center px-4 z-20">
-                <div className="inline-flex items-center gap-2 text-white font-black text-xs sm:text-sm shadow-sm bg-slate-950/40 px-3 py-1.5 rounded backdrop-blur-xs relative group">
-                  <span>{heroBadgeText}</span>
-                  {isAdmin && (
-                    <button 
-                      onClick={(e) => { e.stopPropagation(); onEditHeroBadgeText(); }}
-                      className="p-1 bg-orange-500 hover:bg-orange-600 text-white rounded cursor-pointer transition-all shrink-0 ml-1 shadow-xs"
-                      title="상단 배지 텍스트 수정"
-                    >
-                      <Edit className="w-3 h-3" />
-                    </button>
-                  )}
-                </div>
-                <div className="w-12 h-1 bg-orange-500 mx-auto mt-2 rounded-full" />
-              </div>
             </div>
           </div>
 
