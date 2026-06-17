@@ -27,10 +27,10 @@ export default function Sidebar({
   
   const categoriesList = [
     { id: 'ALL' as Category, label: '전체제품' },
-    { id: 'UG_STANDARD' as Category, label: '케미칼저장탱크(UG/일반형)' },
-    { id: 'UD_DISCHARGE' as Category, label: '완전배출형(UD)' },
-    { id: 'UN_AGITATION' as Category, label: '교반형/소형탱크' },
-    { id: 'DECK_STS' as Category, label: 'DECK형/STS밴드형' },
+    { id: 'UG_STANDARD' as Category, label: 'UG 보강형 일반 탱크' },
+    { id: 'UD_DISCHARGE' as Category, label: 'UD 완전배출 탱크' },
+    { id: 'UN_AGITATION' as Category, label: 'UN조 탱크' },
+    { id: 'DECK_STS' as Category, label: 'STS 보강형 일반 탱크' },
   ];
 
   const handleCompanyGuideClick = (sectionId: string) => {

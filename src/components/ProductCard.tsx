@@ -10,7 +10,7 @@ import { Product } from '../types';
 interface ProductCardProps {
   key?: React.Key;
   product: Product;
-  onViewDetails: (product: Product) => void;
+  onQuoteInquire: (productName: string) => void;
   isAdmin?: boolean;
   onEditProduct?: (product: Product, e: React.MouseEvent) => void;
   onDeleteProduct?: (id: string, e: React.MouseEvent) => void;
@@ -18,15 +18,14 @@ interface ProductCardProps {
 
 export default function ProductCard({ 
   product, 
-  onViewDetails, 
+  onQuoteInquire, 
   isAdmin, 
   onEditProduct, 
   onDeleteProduct 
 }: ProductCardProps) {
   return (
     <div 
-      className="bg-white rounded-xl shadow-xs border border-slate-200 overflow-hidden group flex flex-col h-full transition-all duration-200 hover:-translate-y-0.5 hover:border-orange-500 hover:shadow-md cursor-pointer relative"
-      onClick={() => onViewDetails(product)}
+      className="bg-white rounded-xl shadow-xs border border-slate-200 overflow-hidden group flex flex-col h-full transition-all duration-200 hover:-translate-y-0.5 hover:border-orange-500 hover:shadow-md relative"
       id={`product-card-${product.id}`}
     >
       {/* Product Image Stage */}
@@ -34,12 +33,12 @@ export default function ProductCard({
         <img
           src={product.image}
           alt={product.name}
-          className="w-full h-full object-cover group-hover:scale-103 transition-transform duration-300"
+          className="w-full h-full object-cover transition-transform duration-300"
           referrerPolicy="no-referrer"
         />
         
-        {/* New product indicator */}
-        {product.isNew && (
+        {/* New product indicator - disabled per user request */}
+        {false && product.isNew && (
           <span className="absolute top-2.5 left-2.5 bg-orange-500 text-white font-extrabold text-[10px] px-2 py-0.5 rounded-sm uppercase shadow-xs">
             신품
           </span>
@@ -83,13 +82,13 @@ export default function ProductCard({
       </div>
 
       {/* Corporate spec brief */}
-      <div className="p-4 flex flex-col flex-grow justify-between space-y-3.5">
+      <div 
+        className="p-4 flex flex-col flex-grow justify-between space-y-3.5 cursor-pointer hover:bg-slate-50/50 transition-colors"
+        onClick={() => onQuoteInquire(product.name)}
+      >
         <div className="space-y-1.5">
           <h3 className="font-extrabold text-sm text-slate-800 tracking-tight line-clamp-2 group-hover:text-amber-600 transition-colors">
-            {product.category === 'UG_STANDARD' ? 'PE 케미칼탱크 UG 일반형' :
-             product.category === 'UD_DISCHARGE' ? 'PE 케미칼탱크 UD 완전배출형' :
-             product.category === 'UN_AGITATION' ? 'PE 케미칼탱크 UN/KID 교반형' :
-             product.category === 'DECK_STS' ? 'PE 케미칼탱크 DECK형 / STS밴드형' : product.name}
+            {product.name}
           </h3>
         </div>
 
@@ -103,13 +102,13 @@ export default function ProductCard({
             </span>
           </div>
           <button 
-            className="bg-slate-100 text-slate-600 group-hover:bg-blue-900 group-hover:text-white text-xs font-bold px-2.5 py-1.5 rounded-sm transition-all"
+            className="bg-slate-100 text-slate-600 group-hover:bg-blue-900 group-hover:text-white text-xs font-bold px-2.5 py-1.5 rounded-sm transition-all cursor-pointer"
             onClick={(e) => {
               e.stopPropagation();
-              onViewDetails(product);
+              onQuoteInquire(product.name);
             }}
           >
-            스펙문의
+            견적상담
           </button>
         </div>
       </div>

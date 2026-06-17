@@ -17,13 +17,12 @@ import Header from './components/Header';
 import Hero from './components/Hero';
 import Sidebar from './components/Sidebar';
 import ProductCard from './components/ProductCard';
-import ProductModal from './components/ProductModal';
 import CompanyIntro from './components/CompanyIntro';
 import ProductSpecsList from './components/ProductSpecsList';
 import ConsultationForm from './components/ConsultationForm';
 import Footer from './components/Footer';
 
-import { ChevronLeft, ChevronRight, Plus, X, Lock, ShieldCheck, Edit, Trash2, BookOpen, AlertTriangle, Eye, CheckCircle2, XCircle, Info } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Plus, X, Lock, ShieldCheck, Edit, Trash2, BookOpen, AlertTriangle, Eye, CheckCircle2, XCircle, Info, Settings, RefreshCw } from 'lucide-react';
 
 export default function App() {
   // Navigation & Page Tabs
@@ -31,12 +30,10 @@ export default function App() {
   const [selectedCategory, setSelectedCategory] = useState<Category>('ALL');
   const [searchQuery, setSearchQuery] = useState<string>('');
 
-  // Active product details modal state
-  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
-
   // Admin authentication state
   const [isAdmin, setIsAdmin] = useState<boolean>(() => {
-    return localStorage.getItem('UW_IS_ADMIN') === 'true';
+    const saved = localStorage.getItem('UW_IS_ADMIN');
+    return saved === null ? true : saved === 'true';
   });
 
   // Admin Login Modal States
@@ -47,14 +44,27 @@ export default function App() {
 
   // Custom Editable Badge on Hero banner
   const [heroBadgeText, setHeroBadgeText] = useState<string>(() => {
-    return localStorage.getItem('UW_HERO_BADGE') || 'Orange Active Ring PE Tank';
+    return localStorage.getItem('UW_HERO_BADGE') || 'PE 고강도 보강밴드형 케미칼탱크';
   });
   const [showBadgeEditModal, setShowBadgeEditModal] = useState<boolean>(false);
   const [badgeEditTemp, setBadgeEditTemp] = useState<string>('');
 
   // Custom Editable Main Image on Hero banner
   const [heroImageUrl, setHeroImageUrl] = useState<string>(() => {
-    return localStorage.getItem('UW_HERO_IMAGE') || '/src/assets/images/home_orange_ring_tank_1781673633078.jpg';
+    const saved = localStorage.getItem('UW_HERO_IMAGE');
+    if (saved && !saved.includes('home_orange_ring_tank') && !saved.includes('ug_orange_tank_1781680550681')) {
+      if (saved.includes('uploaded_tank_1_1781683205180.jpg')) {
+        return '/src/assets/images/regenerated_image_1781685239299.png';
+      }
+      if (saved.includes('uploaded_tank_4_1781683252954.jpg')) {
+        return '/src/assets/images/regenerated_image_1781685907524.png';
+      }
+      if (saved.includes('uploaded_tank_3_1781683237138.jpg')) {
+        return '/src/assets/images/regenerated_image_1781685912943.png';
+      }
+      return saved;
+    }
+    return '/src/assets/images/regenerated_image_1781685239299.png';
   });
   const [showImageEditModal, setShowImageEditModal] = useState<boolean>(false);
   const [imageEditTemp, setImageEditTemp] = useState<string>('');
@@ -67,7 +77,59 @@ export default function App() {
   // Dual stateful DB products (saves dynamic edits locally)
   const [products, setProducts] = useState<Product[]>(() => {
     const saved = localStorage.getItem('UW_PRODUCTS_V2');
-    return saved ? JSON.parse(saved) : PRODUCT_DATA;
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved) as Product[];
+        const uniqueProducts: Product[] = [];
+        const seenIds = new Set<string>();
+
+        parsed.forEach((p: Product) => {
+          const currentId = p.id === 'ug-standard' ? 'ug-3000' : p.id;
+          if (seenIds.has(currentId)) {
+            return; // skip duplicate elements
+          }
+          seenIds.add(currentId);
+
+          let image = p.image;
+          if (currentId === 'un-2000') {
+            image = '/src/assets/images/regenerated_image_1781688139818.png';
+          } else if (currentId === 'sts-band-20000') {
+            image = '/src/assets/images/regenerated_image_1781688142077.png';
+          }
+
+          // Dynamically map/migrate old category names to new clean Korean terms
+          let categoryName = p.categoryName;
+          if (p.category === 'UN_AGITATION') {
+            categoryName = 'UN조 탱크';
+          } else if (p.category === 'DECK_STS') {
+            categoryName = 'STS 보강형 일반 탱크';
+          } else if (p.category === 'UG_STANDARD') {
+            categoryName = 'UG 보강형 일반 탱크';
+          } else if (p.category === 'UD_DISCHARGE') {
+            categoryName = 'UD 완전배출 탱크';
+          }
+
+          const defaultProduct = PRODUCT_DATA.find((dp) => dp.id === currentId);
+          if (defaultProduct) {
+            // Merge with default spec records but preserve user's edited values and direct image edits
+            uniqueProducts.push({
+              ...defaultProduct,
+              ...p,
+              id: currentId,
+              image: image || defaultProduct.image,
+              categoryName,
+            });
+          } else {
+            uniqueProducts.push({ ...p, id: currentId, image, categoryName });
+          }
+        });
+        return uniqueProducts;
+      } catch (e) {
+        console.error('Failed to parse saved products, reverting to default data', e);
+        return PRODUCT_DATA;
+      }
+    }
+    return PRODUCT_DATA;
   });
 
   // Inquiries database state (saves dynamically)
@@ -204,8 +266,8 @@ export default function App() {
       ALL: '전체제품',
       UG_STANDARD: 'UG 보강형 일반 탱크',
       UD_DISCHARGE: 'UD 완전배출 탱크',
-      UN_AGITATION: 'UN 화학 교반조 탱크',
-      DECK_STS: '테라스 & STS 부속 자재',
+      UN_AGITATION: 'UN조 탱크',
+      DECK_STS: 'STS 보강형 일반 탱크',
     };
 
     const parsedFeatures = formFeatures
@@ -277,7 +339,7 @@ export default function App() {
 
   const handleBadgeEditSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setHeroBadgeText(badgeEditTemp.trim() || 'Orange Active Ring PE Tank');
+    setHeroBadgeText(badgeEditTemp.trim() || 'PE 고강도 보강밴드형 케미칼탱크');
     setShowBadgeEditModal(false);
   };
 
@@ -289,7 +351,7 @@ export default function App() {
 
   const handleImageEditSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setHeroImageUrl(imageEditTemp.trim() || '/src/assets/images/hero_chemical_tank_1781660858614.jpg');
+    setHeroImageUrl(imageEditTemp.trim() || '/src/assets/images/uploaded_tank_1_1781683205180.jpg');
     setShowImageEditModal(false);
   };
 
@@ -390,7 +452,119 @@ export default function App() {
           {/* Right Principal content viewport depending on current selected tab */}
           <div className="flex-1 min-w-0">
             {currentTab === 'home' && (
-              <div className="space-y-12 animate-in fade-in duration-300">
+              <div className="space-y-8 animate-in fade-in duration-300">
+
+                {/* 🔧 간편 이미지 및 카탈로그 이지 에디터 (Easy Editor console) */}
+                <div className="hidden" id="easy-editor-console">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-800/80">
+                    <div className="flex items-center gap-2.5">
+                      <div className="p-2 bg-orange-500/10 text-orange-400 rounded-lg shrink-0">
+                        <Settings className="w-5 h-5 animate-spin" style={{ animationDuration: '6s' }} />
+                      </div>
+                      <div>
+                        <h3 className="font-extrabold text-sm text-slate-100 flex items-center gap-1.5">
+                          울트라월드 간편 편집 & 데이터 초기화 패널
+                        </h3>
+                        <p className="text-slate-400 text-3xs md:text-[11px] font-medium leading-relaxed">
+                          코딩 필요없이 화면 상에서 제품 정보, 이미지, 배너 문구를 직접 실시간으로 제어하고 리셋할 수 있습니다.
+                        </p>
+                      </div>
+                    </div>
+                    
+                    {/* 데이터 완전 초기화 */}
+                    <button
+                      onClick={() => {
+                        if (window.confirm("기존 브라우저 로컬 캐시(로컬스토리지)에 저장되었던 이미지와 커스텀 수정 데이터를 최신 오렌지-철재 보강 밴드형 정밀 사진과 제품 목록으로 전부 정화(Reset)하여 적용하시겠습니까?\n\n이 클릭은 충돌하는 데이터 설정을 완전히 정형화하고 화면을 리프레시합니다.")) {
+                          localStorage.clear();
+                          window.location.reload();
+                        }
+                      }}
+                      className="inline-flex items-center gap-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all shrink-0 cursor-pointer border border-slate-700/60"
+                    >
+                      <RefreshCw className="w-3.5 h-3.5" />
+                      데이터 및 캐시 완전 복원(Reset)
+                    </button>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-1">
+                    {/* 1. 간편 로그인 토글 */}
+                    <div className="bg-slate-950/40 p-4 rounded-xl border border-slate-800/60 flex flex-col justify-between space-y-3">
+                      <div className="flex items-center justify-between gap-4">
+                        <div>
+                          <span className="text-[11px] font-extrabold text-orange-400 block uppercase tracking-wider">01. 쉬운 수정을 위한 편집 모드 스위치</span>
+                          <span className="text-slate-400 text-3xs font-medium leading-normal block">복잡한 비밀번호 입력 없이 토글 클릭 한 번으로 모든 버튼을 활성화합니다.</span>
+                        </div>
+                        <button
+                          onClick={() => setIsAdmin(!isAdmin)}
+                          className={`px-3 py-2 rounded-xl text-xs font-extrabold transition-all cursor-pointer whitespace-nowrap shrink-0 ${
+                            isAdmin 
+                              ? 'bg-orange-500 text-white shadow-md shadow-orange-500/20' 
+                              : 'bg-slate-800 text-slate-400 hover:bg-slate-750 hover:text-slate-200'
+                          }`}
+                        >
+                          {isAdmin ? 'ON (편집 모드)' : 'OFF (일반 모드)'}
+                        </button>
+                      </div>
+
+                      {isAdmin ? (
+                        <div className="bg-green-500/10 text-green-400 border border-green-500/20 p-2.5 rounded-lg text-3xs font-medium space-y-1">
+                          <p className="flex items-center gap-1 font-bold">
+                            <span className="w-1.5 h-1.5 bg-green-405 rounded-full shrink-0 animate-ping"></span>
+                            <span>수정 권한 활성화 완료! 아래의 수정법을 확인해보세요:</span>
+                          </p>
+                          <ul className="list-disc pl-3.5 space-y-0.5 text-slate-300">
+                            <li>하단 각 제품 카드 우상단의 <strong className="text-white">[수정]</strong> 버튼으로 상세 규격을 실시간 수정</li>
+                            <li>하단 제품 목록 우측 상단의 <strong className="text-white">[새 제품 추가]</strong> 버튼으로 신규 탱크 추가</li>
+                            <li>상단 히어로 배너 우측 하단의 <strong className="text-white">[대표 사진 수정]</strong> 카메라 아이콘 클릭 후 사진 교체</li>
+                          </ul>
+                        </div>
+                      ) : (
+                        <div className="bg-slate-900/50 text-slate-500 p-2.5 rounded-lg text-3xs font-medium leading-relaxed">
+                          스위치를 ON으로 켜시면 복잡한 로그인 과정 없이 웹페이지 내용물들을 직접 고치는 버튼들이 즉각 활성화됩니다.
+                        </div>
+                      )}
+                    </div>
+
+                     <div className="bg-slate-950/40 p-4 rounded-xl border border-slate-800/60 space-y-2.5 flex flex-col justify-between">
+                       <div>
+                         <span className="text-[11px] font-extrabold text-orange-400 block uppercase tracking-wider">02. 업로드 실물 탱크 사진 8종 원클릭 즉시 가설 연동</span>
+                         <span className="text-slate-400 text-3xs font-medium block leading-normal">아래 버튼을 누르면 상단 메인을 귀하가 올린 8개의 무수정 실물 원본 탱크 고화질 사진 중 하나로 즉시 전환 연동시킵니다.</span>
+                       </div>
+ 
+                       <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 mt-2">
+                         {[
+                           { label: '01. UG 오렌지 철재거치', url: '/src/assets/images/regenerated_image_1781685239299.png' },
+                           { label: '02. 사각 도징용 백색', url: '/src/assets/images/uploaded_tank_6_1781683278949.jpg' },
+                           { label: '03. 안전 가드데크 사다리', url: '/src/assets/images/regenerated_image_1781685912943.png' },
+                           { label: '04. 공장 거치형 주황보강', url: '/src/assets/images/regenerated_image_1781685907524.png' },
+                           { label: '05. 소형 백색 주입용', url: '/src/assets/images/uploaded_tank_2_1781683222315.jpg' },
+                           { label: '06. UN120 눈금 백색원형', url: '/src/assets/images/uploaded_tank_5_1781683266079.jpg' },
+                           { label: '07. 광택 STS 보강 밴드', url: '/src/assets/images/uploaded_tank_7_1781683291987.jpg' },
+                           { label: '08. 야외 주황 가드 사다리', url: '/src/assets/images/uploaded_tank_8_1781683306440.jpg' },
+                         ].map((preset, index) => {
+                           const isCurrent = heroImageUrl === preset.url;
+                           return (
+                             <button
+                               key={index}
+                               onClick={() => {
+                                 setHeroImageUrl(preset.url);
+                                 setImageEditTemp(preset.url);
+                               }}
+                               className={`p-2 rounded-lg text-[10px] font-semibold text-left transition-all border shrink-0 flex items-center justify-between cursor-pointer ${
+                                 isCurrent 
+                                   ? 'border-orange-500 bg-orange-500/10 text-orange-400 font-extrabold' 
+                                   : 'border-slate-850 bg-slate-900 hover:border-slate-700 text-slate-400'
+                               }`}
+                             >
+                               <span className="truncate">{preset.label}</span>
+                               {isCurrent && <span className="w-1.5 h-1.5 rounded-full bg-orange-400 shrink-0 ml-1"></span>}
+                             </button>
+                           );
+                         })}
+                      </div>
+                    </div>
+                  </div>
+                </div>
                 
                 {/* Product Search Filtering HUD status */}
                 {searchQuery && (
@@ -440,7 +614,7 @@ export default function App() {
                         <ProductCard
                           key={product.id}
                           product={product}
-                          onViewDetails={(p) => setSelectedProduct(p)}
+                          onQuoteInquire={handleQuoteSelection}
                           isAdmin={isAdmin}
                           onEditProduct={handleOpenProductEdit}
                           onDeleteProduct={handleDeleteProduct}
@@ -470,7 +644,6 @@ export default function App() {
             {currentTab === 'products' && (
               <ProductSpecsList 
                 onQuoteClick={handleQuoteSelection} 
-                onViewProductDetails={(p) => setSelectedProduct(p)}
               />
             )}
 
@@ -495,13 +668,6 @@ export default function App() {
 
       {/* 4. Footer Corporate Information section */}
       <Footer />
-
-      {/* 5. Elegant Detailed specifications modal popup portal */}
-      <ProductModal
-        product={selectedProduct}
-        onClose={() => setSelectedProduct(null)}
-        onInstantInquire={handleQuoteSelection}
-      />
 
       {/* ======================================================= */}
       {/* ADMIN LEVEL SYSTEM MODALS */}
@@ -658,20 +824,24 @@ export default function App() {
               </div>
 
               {/* Quick presets for easier admin choice */}
-              <div className="space-y-1.5">
-                <span className="text-[10px] font-extrabold text-slate-500 uppercase tracking-wider block">샘플 프리셋 디자인 선택</span>
-                <div className="grid grid-cols-2 gap-2">
+              <div className="hidden">
+                <span className="text-[10px] font-extrabold text-slate-500 uppercase tracking-wider block">실물 고화질 탱크 사진 8종 선택</span>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
                   {[
-                    { label: 'UG 오렌지형', url: '/src/assets/images/hero_chemical_tank_1781660858614.jpg' },
-                    { label: 'UG 표준 청색형', url: '/src/assets/images/ug_standard_tank_1781660874171.jpg' },
-                    { label: 'UD 완전배출형', url: '/src/assets/images/ud_drainage_tank_1781660890538.jpg' },
-                    { label: 'UN형 밀폐교반형', url: '/src/assets/images/un_agitation_tank_1781660904203.jpg' },
+                    { label: '01. UG 오렌지 철재거치', url: '/src/assets/images/regenerated_image_1781685239299.png' },
+                    { label: '02. 사각 도징용 백색', url: '/src/assets/images/uploaded_tank_6_1781683278949.jpg' },
+                    { label: '03. 안전 가드데크 사다리', url: '/src/assets/images/regenerated_image_1781685912943.png' },
+                    { label: '04. 공장 거치형 주황보강', url: '/src/assets/images/regenerated_image_1781685907524.png' },
+                    { label: '05. 소형 백색 주입용', url: '/src/assets/images/uploaded_tank_2_1781683222315.jpg' },
+                    { label: '06. UN120 눈금 백색원형', url: '/src/assets/images/uploaded_tank_5_1781683266079.jpg' },
+                    { label: '07. 광택 STS 보강 밴드', url: '/src/assets/images/uploaded_tank_7_1781683291987.jpg' },
+                    { label: '08. 야외 주황 가드 사다리', url: '/src/assets/images/uploaded_tank_8_1781683306440.jpg' },
                   ].map((preset, index) => (
                     <button
                       key={index}
                       type="button"
                       onClick={() => setImageEditTemp(preset.url)}
-                      className={`p-2 border text-left rounded-lg text-2xs transition-all cursor-pointer ${
+                      className={`p-2 border text-left rounded-lg text-3xs transition-all cursor-pointer ${
                         imageEditTemp === preset.url 
                           ? 'border-orange-500 bg-orange-50/50 text-orange-700 font-bold' 
                           : 'border-slate-200 hover:border-slate-350 text-slate-600'
@@ -746,21 +916,25 @@ export default function App() {
                   >
                     <option value="UG_STANDARD">UG 보강형 일반 탱크</option>
                     <option value="UD_DISCHARGE">UD 완전배출 탱크</option>
-                    <option value="UN_AGITATION">UN 화학 교반조 탱크</option>
-                    <option value="DECK_STS">테라스 & STS 부속 자재</option>
+                    <option value="UN_AGITATION">UN조 탱크</option>
+                    <option value="DECK_STS">STS 보강형 일반 탱크</option>
                   </select>
                 </div>
               </div>
 
               {/* Dynamic Image Preset Selector Helper */}
-              <div className="space-y-2 p-3 bg-slate-50 rounded-lg border border-slate-150">
+              <div className="hidden">
                 <span className="text-[11px] font-extrabold text-slate-700 block">장비 이미지 프리셋 선택 (매우 권장)</span>
-                <div className="grid grid-cols-4 gap-2">
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                   {[
-                    { label: 'UG 표준보강형', img: '/src/assets/images/ug_standard_tank_1781660874171.jpg' },
-                    { label: 'UD 이중배출형', img: '/src/assets/images/ud_drainage_tank_1781660890538.jpg' },
-                    { label: 'UN 화학교반', img: '/src/assets/images/un_agitation_tank_1781660904203.jpg' },
-                    { label: '소형 특수형', img: '/src/assets/images/small_pe_tank_1781660919123.jpg' },
+                    { label: '01. UG 오렌지 철재거치', img: '/src/assets/images/regenerated_image_1781685239299.png' },
+                    { label: '02. 사각 도징용 백색', img: '/src/assets/images/uploaded_tank_6_1781683278949.jpg' },
+                    { label: '03. 안전 가드데크 사다리', img: '/src/assets/images/regenerated_image_1781685912943.png' },
+                    { label: '04. 공장 거치형 주황보강', img: '/src/assets/images/regenerated_image_1781685907524.png' },
+                    { label: '05. 소형 백색 주입용', img: '/src/assets/images/uploaded_tank_2_1781683222315.jpg' },
+                    { label: '06. UN120 눈금 백색원형', img: '/src/assets/images/uploaded_tank_5_1781683266079.jpg' },
+                    { label: '07. 광택 STS 보강 밴드', img: '/src/assets/images/uploaded_tank_7_1781683291987.jpg' },
+                    { label: '08. 야외 주황 가드 사다리', img: '/src/assets/images/uploaded_tank_8_1781683306440.jpg' },
                   ].map((preset) => (
                     <button
                       key={preset.label}
@@ -773,9 +947,9 @@ export default function App() {
                       }`}
                     >
                       <div className="w-full h-8 bg-slate-150 rounded overflow-hidden mb-1 pointer-events-none">
-                        <img src={preset.img} className="w-full h-full object-cover" />
+                        <img src={preset.img} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
                       </div>
-                      {preset.label}
+                      <span className="block truncate text-[8px] leading-tight font-medium">{preset.label}</span>
                     </button>
                   ))}
                 </div>

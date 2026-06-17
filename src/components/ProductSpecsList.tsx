@@ -10,10 +10,9 @@ import { Product } from '../types';
 
 interface ProductSpecsProps {
   onQuoteClick: (productName: string) => void;
-  onViewProductDetails: (product: Product) => void;
 }
 
-export default function ProductSpecsList({ onQuoteClick, onViewProductDetails }: ProductSpecsProps) {
+export default function ProductSpecsList({ onQuoteClick }: ProductSpecsProps) {
   const [capacityFilter, setCapacityFilter] = useState<string>('ALL');
   const [searchText, setSearchText] = useState<string>('');
 
