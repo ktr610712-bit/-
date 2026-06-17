@@ -1,0 +1,6 @@
+{
+  "name": "울트라월드(주)",
+  "description": "약품탱크·케미칼탱크 전문 제조 업체 울트라월드(주). 저장조 PE탱크, UN형, 교반형, 소형 탱크 맞춤 제작 및 전국 공급.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
