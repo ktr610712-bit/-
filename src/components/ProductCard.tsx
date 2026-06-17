@@ -79,12 +79,7 @@ export default function ProductCard({
         )}
 
         {/* Hover overlay detail indicator */}
-        <div className="absolute inset-0 bg-slate-950/20 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity duration-200">
-          <div className="bg-white text-slate-900 border border-slate-100 text-xs font-bold px-3 py-1.5 rounded-sm shadow-md flex items-center gap-1.5 transform translate-y-1 group-hover:translate-y-0 transition-transform duration-200">
-            <Eye className="w-3.5 h-3.5 text-orange-500" />
-            상세 스펙 보기
-          </div>
-        </div>
+        <div className="absolute inset-0 bg-slate-950/5 opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
       </div>
 
       {/* Corporate spec brief */}
