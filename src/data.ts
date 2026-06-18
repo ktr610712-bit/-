@@ -8,16 +8,16 @@ import { Product, Inquiry } from './types';
 // Let's resolve the actual image URLs we generated.
 // Mapping the uploaded raw original images to their correct product labels
 const images = {
-  // 01. UG 오렌지 철재거치 -> 사용자가 제공한 새로운 고화질 이미지 적용
+  // 01. UG 주황 철재거치 -> 사용자가 제공한 새로운 고화질 이미지 적용 (1번)
   ug: '/assets/images/regenerated_image_1781685239299.png',
   
-  // 02. 소형 백색 주입용 (White cylinder chemical tank with grey framing and green tape caps)
-  un: '/assets/images/uploaded_tank_2_1781683222315.jpg',
+  // 09. UN형 고화질 교반탱크 적용 (9번으로 대체)
+  un: '/assets/images/regenerated_image_1781688139818.png',
   
-  // 03. 안전 가드데크 사다리 (Single orange tank with yellow guardrail and yellow ladder outside) -> 고화질 재생성 파일 적용
+  // 03. 안전 가드데크 사다리 -> 고화질 재생성 파일 적용 (3번)
   deck: '/assets/images/regenerated_image_1781685912943.png',
   
-  // 04. 공장 거치형 주황보강 (Orange storage tanks with overhead rectangular frames) -> 고화질 재생성 파일 적용
+  // 04. 공장 거치형 주황보강 -> 고화질 재생성 파일 적용 (4번)
   ud: '/assets/images/regenerated_image_1781685907524.png',
   
   // 05. UN120 눈금 백색원형 (Cylindrical container with graduation lines and UN120 print)
@@ -26,8 +26,8 @@ const images = {
   // 06. 사각 도징용 백색탱크 (White square dosing container with white lid)
   kid: '/assets/images/uploaded_tank_6_1781683278949.jpg',
   
-  // 07. 광택 STS 보강 밴드 (Orange tanks wrapped in stainless steel bands)
-  sts: '/assets/images/uploaded_tank_7_1781683291987.jpg',
+  // 10. STS보강 고화질 탱크 -> 고화질 재생성 파일 적용 (10번)
+  sts: '/assets/images/regenerated_image_1781688142077.png',
   
   // 08. 야외 주황 가드 사다리 (Orange tank safety frame and yellow cage ladder inside facility)
   deck_ladder: '/assets/images/uploaded_tank_8_1781683306440.jpg',

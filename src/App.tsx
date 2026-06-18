@@ -91,13 +91,57 @@ export default function App() {
           seenIds.add(currentId);
 
           let image = p.image;
+          // 1) /src/assets/images 구버전 경로 들어있으면 적극 치환
           if (image && image.includes('/src/assets/images')) {
             image = image.replace('/src/assets/images', '/assets/images');
           }
-          if (currentId === 'un-2000') {
-            image = '/assets/images/regenerated_image_1781688139818.png';
-          } else if (currentId === 'sts-band-20000') {
-            image = '/assets/images/regenerated_image_1781688142077.png';
+          
+          // 2) 이번에 재생성된 초고화질 신규 레퍼런스 이미지 및 원본 업로드된 유효 이미지 전체 허용 세트
+          const validSet = new Set([
+            '/assets/images/regenerated_image_1781685239299.png',
+            '/assets/images/regenerated_image_1781685912943.png',
+            '/assets/images/regenerated_image_1781685907524.png',
+            '/assets/images/regenerated_image_1781688139818.png',
+            '/assets/images/regenerated_image_1781688142077.png',
+            '/assets/images/uploaded_tank_5_1781683266079.jpg',
+            '/assets/images/uploaded_tank_6_1781683278949.jpg',
+            '/assets/images/uploaded_tank_8_1781683306440.jpg'
+          ]);
+
+          const defaultProduct = PRODUCT_DATA.find((dp) => dp.id === currentId);
+
+          // 만약 이미지가 정의되어 있지 않거나, 구버전 임시 경로이거나, 유효 세트가 아닐 경우 각 제품 카테고리에 맞는 기본 지정값으로 안전 회복
+          if (!image || image.includes('/src/assets/') || !validSet.has(image)) {
+            if (defaultProduct) {
+              image = defaultProduct.image;
+            } else {
+              const idLow = currentId.toLowerCase();
+              const nameLow = (p.name || '').toLowerCase();
+              const catLow = (p.category || '').toLowerCase();
+
+              if (idLow.includes('un-mixer') || idLow.includes('un-2000') || idLow.includes('mixer') || catLow.includes('un_agitation') || nameLow.includes('교반') || nameLow.includes('dosing')) {
+                image = '/assets/images/regenerated_image_1781688139818.png';
+              } else if (idLow.includes('sts') || nameLow.includes('sts') || nameLow.includes('밴드')) {
+                image = '/assets/images/regenerated_image_1781688142077.png';
+              } else if (idLow.includes('deck') || nameLow.includes('deck') || nameLow.includes('데크') || nameLow.includes('사다리')) {
+                image = '/assets/images/regenerated_image_1781685912943.png';
+              } else if (idLow.includes('ud') || idLow.includes('discharge') || catLow.includes('ud_discharge') || nameLow.includes('배출')) {
+                image = '/assets/images/regenerated_image_1781685907524.png';
+              } else {
+                image = '/assets/images/regenerated_image_1781685239299.png';
+              }
+            }
+          }
+
+          // 구버전 localStorage에 잘못 저장된 중복된 교반형/데크형 임시 이미지를 본래의 전용(눈금, 사각, 야외사다리) 고유 이미지로 자동 치유합니다.
+          if (defaultProduct) {
+            if (currentId === 'un-standard-tank' && image === '/assets/images/regenerated_image_1781688139818.png') {
+              image = defaultProduct.image;
+            } else if (currentId === 'kid-dosing-tank' && image === '/assets/images/regenerated_image_1781688139818.png') {
+              image = defaultProduct.image;
+            } else if (currentId === 'un-mixed-agitation' && (image === '/assets/images/regenerated_image_1781685912943.png' || image === '/assets/images/regenerated_image_1781688139818.png')) {
+              image = defaultProduct.image;
+            }
           }
 
           // Dynamically map/migrate old category names to new clean Korean terms
@@ -112,14 +156,13 @@ export default function App() {
             categoryName = 'UD 완전배출 탱크';
           }
 
-          const defaultProduct = PRODUCT_DATA.find((dp) => dp.id === currentId);
           if (defaultProduct) {
             // Merge with default spec records but preserve user's edited values and direct image edits
             uniqueProducts.push({
               ...defaultProduct,
               ...p,
               id: currentId,
-              image: image || defaultProduct.image,
+              image: image,
               categoryName,
             });
           } else {
@@ -458,7 +501,7 @@ export default function App() {
               <div className="space-y-8 animate-in fade-in duration-300">
 
                 {/* 🔧 간편 이미지 및 카탈로그 이지 에디터 (Easy Editor console) */}
-                <div className="hidden" id="easy-editor-console">
+                <div className="bg-slate-900 border border-slate-800 p-5 rounded-2xl shadow-2xl space-y-4 mb-8" id="easy-editor-console">
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-800/80">
                     <div className="flex items-center gap-2.5">
                       <div className="p-2 bg-orange-500/10 text-orange-400 rounded-lg shrink-0">
@@ -926,17 +969,19 @@ export default function App() {
               </div>
 
               {/* Dynamic Image Preset Selector Helper */}
-              <div className="hidden">
-                <span className="text-[11px] font-extrabold text-slate-700 block">장비 이미지 프리셋 선택 (매우 권장)</span>
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+              <div className="space-y-2.5 p-3 bg-slate-50 rounded-xl border border-slate-200">
+                <span className="text-[11.5px] font-bold text-slate-700 flex items-center gap-1.5">
+                  <span className="text-orange-500 font-extrabold">📸</span> 원클릭 장비 이미지 프리셋 선택 (매우 권장)
+                </span>
+                <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-1.5">
                   {[
-                    { label: '01. UG 오렌지 철재거치', img: '/assets/images/regenerated_image_1781685239299.png' },
-                    { label: '02. 사각 도징용 백색', img: '/assets/images/uploaded_tank_6_1781683278949.jpg' },
-                    { label: '03. 안전 가드데크 사다리', img: '/assets/images/regenerated_image_1781685912943.png' },
-                    { label: '04. 공장 거치형 주황보강', img: '/assets/images/regenerated_image_1781685907524.png' },
-                    { label: '05. 소형 백색 주입용', img: '/assets/images/uploaded_tank_2_1781683222315.jpg' },
+                    { label: '01. UG 주황 철재거치', img: '/assets/images/regenerated_image_1781685239299.png' },
+                    { label: '02. 안전 가드데크 사다리', img: '/assets/images/regenerated_image_1781685912943.png' },
+                    { label: '03. 공장 거치형 주황보강', img: '/assets/images/regenerated_image_1781685907524.png' },
+                    { label: '04. UN형 고화질 교반탱크', img: '/assets/images/regenerated_image_1781688139818.png' },
+                    { label: '05. STS보강 고화질 탱크', img: '/assets/images/regenerated_image_1781688142077.png' },
                     { label: '06. UN120 눈금 백색원형', img: '/assets/images/uploaded_tank_5_1781683266079.jpg' },
-                    { label: '07. 광택 STS 보강 밴드', img: '/assets/images/uploaded_tank_7_1781683291987.jpg' },
+                    { label: '07. 사각 도징용 백색탱크', img: '/assets/images/uploaded_tank_6_1781683278949.jpg' },
                     { label: '08. 야외 주황 가드 사다리', img: '/assets/images/uploaded_tank_8_1781683306440.jpg' },
                   ].map((preset) => (
                     <button
