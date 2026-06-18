@@ -9,28 +9,28 @@ import { Product, Inquiry } from './types';
 // Mapping the uploaded raw original images to their correct product labels
 const images = {
   // 01. UG 오렌지 철재거치 -> 사용자가 제공한 새로운 고화질 이미지 적용
-  ug: '/src/assets/images/regenerated_image_1781685239299.png',
+  ug: '/assets/images/regenerated_image_1781685239299.png',
   
   // 02. 소형 백색 주입용 (White cylinder chemical tank with grey framing and green tape caps)
-  un: '/src/assets/images/uploaded_tank_2_1781683222315.jpg',
+  un: '/assets/images/uploaded_tank_2_1781683222315.jpg',
   
   // 03. 안전 가드데크 사다리 (Single orange tank with yellow guardrail and yellow ladder outside) -> 고화질 재생성 파일 적용
-  deck: '/src/assets/images/regenerated_image_1781685912943.png',
+  deck: '/assets/images/regenerated_image_1781685912943.png',
   
   // 04. 공장 거치형 주황보강 (Orange storage tanks with overhead rectangular frames) -> 고화질 재생성 파일 적용
-  ud: '/src/assets/images/regenerated_image_1781685907524.png',
+  ud: '/assets/images/regenerated_image_1781685907524.png',
   
   // 05. UN120 눈금 백색원형 (Cylindrical container with graduation lines and UN120 print)
-  small: '/src/assets/images/uploaded_tank_5_1781683266079.jpg',
+  small: '/assets/images/uploaded_tank_5_1781683266079.jpg',
   
   // 06. 사각 도징용 백색탱크 (White square dosing container with white lid)
-  kid: '/src/assets/images/uploaded_tank_6_1781683278949.jpg',
+  kid: '/assets/images/uploaded_tank_6_1781683278949.jpg',
   
   // 07. 광택 STS 보강 밴드 (Orange tanks wrapped in stainless steel bands)
-  sts: '/src/assets/images/uploaded_tank_7_1781683291987.jpg',
+  sts: '/assets/images/uploaded_tank_7_1781683291987.jpg',
   
   // 08. 야외 주황 가드 사다리 (Orange tank safety frame and yellow cage ladder inside facility)
-  deck_ladder: '/src/assets/images/uploaded_tank_8_1781683306440.jpg',
+  deck_ladder: '/assets/images/uploaded_tank_8_1781683306440.jpg',
 };
 
 export const PRODUCT_DATA: Product[] = [

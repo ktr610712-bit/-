@@ -54,17 +54,17 @@ export default function App() {
     const saved = localStorage.getItem('UW_HERO_IMAGE');
     if (saved && !saved.includes('home_orange_ring_tank') && !saved.includes('ug_orange_tank_1781680550681')) {
       if (saved.includes('uploaded_tank_1_1781683205180.jpg')) {
-        return '/src/assets/images/regenerated_image_1781685239299.png';
+        return '/assets/images/regenerated_image_1781685239299.png';
       }
       if (saved.includes('uploaded_tank_4_1781683252954.jpg')) {
-        return '/src/assets/images/regenerated_image_1781685907524.png';
+        return '/assets/images/regenerated_image_1781685907524.png';
       }
       if (saved.includes('uploaded_tank_3_1781683237138.jpg')) {
-        return '/src/assets/images/regenerated_image_1781685912943.png';
+        return '/assets/images/regenerated_image_1781685912943.png';
       }
       return saved;
     }
-    return '/src/assets/images/regenerated_image_1781685239299.png';
+    return '/assets/images/regenerated_image_1781685239299.png';
   });
   const [showImageEditModal, setShowImageEditModal] = useState<boolean>(false);
   const [imageEditTemp, setImageEditTemp] = useState<string>('');
@@ -91,10 +91,13 @@ export default function App() {
           seenIds.add(currentId);
 
           let image = p.image;
+          if (image && image.includes('/src/assets/images')) {
+            image = image.replace('/src/assets/images', '/assets/images');
+          }
           if (currentId === 'un-2000') {
-            image = '/src/assets/images/regenerated_image_1781688139818.png';
+            image = '/assets/images/regenerated_image_1781688139818.png';
           } else if (currentId === 'sts-band-20000') {
-            image = '/src/assets/images/regenerated_image_1781688142077.png';
+            image = '/assets/images/regenerated_image_1781688142077.png';
           }
 
           // Dynamically map/migrate old category names to new clean Korean terms
@@ -234,7 +237,7 @@ export default function App() {
     setEditingProduct(null);
     setFormName('');
     setFormCategory('UG_STANDARD');
-    setFormImage('/src/assets/images/ug_standard_tank_1781660874171.jpg');
+    setFormImage('/assets/images/ug_standard_tank_1781660874171.jpg');
     setFormCapacity('10,000 L (10톤)');
     setFormDimensions('Ø 2,500 x H 3,200 mm');
     setFormModel('UW-UG-10000');
@@ -351,7 +354,7 @@ export default function App() {
 
   const handleImageEditSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setHeroImageUrl(imageEditTemp.trim() || '/src/assets/images/uploaded_tank_1_1781683205180.jpg');
+    setHeroImageUrl(imageEditTemp.trim() || '/assets/images/uploaded_tank_1_1781683205180.jpg');
     setShowImageEditModal(false);
   };
 
@@ -533,14 +536,14 @@ export default function App() {
  
                        <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 mt-2">
                          {[
-                           { label: '01. UG 오렌지 철재거치', url: '/src/assets/images/regenerated_image_1781685239299.png' },
-                           { label: '02. 사각 도징용 백색', url: '/src/assets/images/uploaded_tank_6_1781683278949.jpg' },
-                           { label: '03. 안전 가드데크 사다리', url: '/src/assets/images/regenerated_image_1781685912943.png' },
-                           { label: '04. 공장 거치형 주황보강', url: '/src/assets/images/regenerated_image_1781685907524.png' },
-                           { label: '05. 소형 백색 주입용', url: '/src/assets/images/uploaded_tank_2_1781683222315.jpg' },
-                           { label: '06. UN120 눈금 백색원형', url: '/src/assets/images/uploaded_tank_5_1781683266079.jpg' },
-                           { label: '07. 광택 STS 보강 밴드', url: '/src/assets/images/uploaded_tank_7_1781683291987.jpg' },
-                           { label: '08. 야외 주황 가드 사다리', url: '/src/assets/images/uploaded_tank_8_1781683306440.jpg' },
+                           { label: '01. UG 오렌지 철재거치', url: '/assets/images/regenerated_image_1781685239299.png' },
+                           { label: '02. 사각 도징용 백색', url: '/assets/images/uploaded_tank_6_1781683278949.jpg' },
+                           { label: '03. 안전 가드데크 사다리', url: '/assets/images/regenerated_image_1781685912943.png' },
+                           { label: '04. 공장 거치형 주황보강', url: '/assets/images/regenerated_image_1781685907524.png' },
+                           { label: '05. 소형 백색 주입용', url: '/assets/images/uploaded_tank_2_1781683222315.jpg' },
+                           { label: '06. UN120 눈금 백색원형', url: '/assets/images/uploaded_tank_5_1781683266079.jpg' },
+                           { label: '07. 광택 STS 보강 밴드', url: '/assets/images/uploaded_tank_7_1781683291987.jpg' },
+                           { label: '08. 야외 주황 가드 사다리', url: '/assets/images/uploaded_tank_8_1781683306440.jpg' },
                          ].map((preset, index) => {
                            const isCurrent = heroImageUrl === preset.url;
                            return (
@@ -828,14 +831,14 @@ export default function App() {
                 <span className="text-[10px] font-extrabold text-slate-500 uppercase tracking-wider block">실물 고화질 탱크 사진 8종 선택</span>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
                   {[
-                    { label: '01. UG 오렌지 철재거치', url: '/src/assets/images/regenerated_image_1781685239299.png' },
-                    { label: '02. 사각 도징용 백색', url: '/src/assets/images/uploaded_tank_6_1781683278949.jpg' },
-                    { label: '03. 안전 가드데크 사다리', url: '/src/assets/images/regenerated_image_1781685912943.png' },
-                    { label: '04. 공장 거치형 주황보강', url: '/src/assets/images/regenerated_image_1781685907524.png' },
-                    { label: '05. 소형 백색 주입용', url: '/src/assets/images/uploaded_tank_2_1781683222315.jpg' },
-                    { label: '06. UN120 눈금 백색원형', url: '/src/assets/images/uploaded_tank_5_1781683266079.jpg' },
-                    { label: '07. 광택 STS 보강 밴드', url: '/src/assets/images/uploaded_tank_7_1781683291987.jpg' },
-                    { label: '08. 야외 주황 가드 사다리', url: '/src/assets/images/uploaded_tank_8_1781683306440.jpg' },
+                    { label: '01. UG 오렌지 철재거치', url: '/assets/images/regenerated_image_1781685239299.png' },
+                    { label: '02. 사각 도징용 백색', url: '/assets/images/uploaded_tank_6_1781683278949.jpg' },
+                    { label: '03. 안전 가드데크 사다리', url: '/assets/images/regenerated_image_1781685912943.png' },
+                    { label: '04. 공장 거치형 주황보강', url: '/assets/images/regenerated_image_1781685907524.png' },
+                    { label: '05. 소형 백색 주입용', url: '/assets/images/uploaded_tank_2_1781683222315.jpg' },
+                    { label: '06. UN120 눈금 백색원형', url: '/assets/images/uploaded_tank_5_1781683266079.jpg' },
+                    { label: '07. 광택 STS 보강 밴드', url: '/assets/images/uploaded_tank_7_1781683291987.jpg' },
+                    { label: '08. 야외 주황 가드 사다리', url: '/assets/images/uploaded_tank_8_1781683306440.jpg' },
                   ].map((preset, index) => (
                     <button
                       key={index}
@@ -927,14 +930,14 @@ export default function App() {
                 <span className="text-[11px] font-extrabold text-slate-700 block">장비 이미지 프리셋 선택 (매우 권장)</span>
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                   {[
-                    { label: '01. UG 오렌지 철재거치', img: '/src/assets/images/regenerated_image_1781685239299.png' },
-                    { label: '02. 사각 도징용 백색', img: '/src/assets/images/uploaded_tank_6_1781683278949.jpg' },
-                    { label: '03. 안전 가드데크 사다리', img: '/src/assets/images/regenerated_image_1781685912943.png' },
-                    { label: '04. 공장 거치형 주황보강', img: '/src/assets/images/regenerated_image_1781685907524.png' },
-                    { label: '05. 소형 백색 주입용', img: '/src/assets/images/uploaded_tank_2_1781683222315.jpg' },
-                    { label: '06. UN120 눈금 백색원형', img: '/src/assets/images/uploaded_tank_5_1781683266079.jpg' },
-                    { label: '07. 광택 STS 보강 밴드', img: '/src/assets/images/uploaded_tank_7_1781683291987.jpg' },
-                    { label: '08. 야외 주황 가드 사다리', img: '/src/assets/images/uploaded_tank_8_1781683306440.jpg' },
+                    { label: '01. UG 오렌지 철재거치', img: '/assets/images/regenerated_image_1781685239299.png' },
+                    { label: '02. 사각 도징용 백색', img: '/assets/images/uploaded_tank_6_1781683278949.jpg' },
+                    { label: '03. 안전 가드데크 사다리', img: '/assets/images/regenerated_image_1781685912943.png' },
+                    { label: '04. 공장 거치형 주황보강', img: '/assets/images/regenerated_image_1781685907524.png' },
+                    { label: '05. 소형 백색 주입용', img: '/assets/images/uploaded_tank_2_1781683222315.jpg' },
+                    { label: '06. UN120 눈금 백색원형', img: '/assets/images/uploaded_tank_5_1781683266079.jpg' },
+                    { label: '07. 광택 STS 보강 밴드', img: '/assets/images/uploaded_tank_7_1781683291987.jpg' },
+                    { label: '08. 야외 주황 가드 사다리', img: '/assets/images/uploaded_tank_8_1781683306440.jpg' },
                   ].map((preset) => (
                     <button
                       key={preset.label}
@@ -1144,7 +1147,7 @@ export default function App() {
                     {/* Visual representative tank */}
                     <div className="relative rounded-xl overflow-hidden border-4 border-slate-850 h-64 shadow-2xl bg-slate-800">
                       <img 
-                        src="/src/assets/images/catalogue_hero_image_1781672372152.jpg" 
+                        src="/assets/images/catalogue_hero_image_1781672372152.jpg" 
                         alt="울트라 화학 탱크 대표" 
                         className="w-full h-full object-cover"
                       />
