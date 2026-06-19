@@ -52,18 +52,21 @@ export default function App() {
   // Custom Editable Main Image on Hero banner
   const [heroImageUrl, setHeroImageUrl] = useState<string>(() => {
     const saved = localStorage.getItem('UW_HERO_IMAGE');
-    if (saved && !saved.includes('home_orange_ring_tank') && !saved.includes('ug_orange_tank_1781680550681')) {
-      if (saved.includes('uploaded_tank_1_1781683205180.jpg')) {
-        return '/assets/images/regenerated_image_1781685239299.png';
-      }
-      if (saved.includes('uploaded_tank_4_1781683252954.jpg')) {
-        return '/assets/images/regenerated_image_1781685907524.png';
-      }
-      if (saved.includes('uploaded_tank_3_1781683237138.jpg')) {
-        return '/assets/images/regenerated_image_1781685912943.png';
-      }
+    const validHeroSet = new Set([
+      '/assets/images/regenerated_image_1781685239299.png',
+      '/assets/images/regenerated_image_1781685912943.png',
+      '/assets/images/regenerated_image_1781685907524.png',
+      '/assets/images/regenerated_image_1781688139818.png',
+      '/assets/images/regenerated_image_1781688142077.png',
+      '/assets/images/uploaded_tank_5_1781683266079.jpg',
+      '/assets/images/uploaded_tank_6_1781683278949.jpg',
+      '/assets/images/uploaded_tank_8_1781683306440.jpg'
+    ]);
+
+    if (saved && validHeroSet.has(saved)) {
       return saved;
     }
+    // 캐시가 깨져있거나, 구버전 주소이거나, 경로가 올바르지 않으면 메인 오렌지 철재보강 정밀 사진(1번)으로 실시간 동기 복구합니다.
     return '/assets/images/regenerated_image_1781685239299.png';
   });
   const [showImageEditModal, setShowImageEditModal] = useState<boolean>(false);
@@ -76,100 +79,37 @@ export default function App() {
 
   // Dual stateful DB products (saves dynamic edits locally)
   const [products, setProducts] = useState<Product[]>(() => {
+    // 8개 주요 제품으로 엄밀 축소하고, 로컬 캐시 오염을 완전히 소거하기 위해 8개 외의 항목은 모두 배제합니다.
     const saved = localStorage.getItem('UW_PRODUCTS_V2');
     if (saved) {
       try {
         const parsed = JSON.parse(saved) as Product[];
-        const uniqueProducts: Product[] = [];
-        const seenIds = new Set<string>();
-
-        parsed.forEach((p: Product) => {
-          const currentId = p.id === 'ug-standard' ? 'ug-3000' : p.id;
-          if (seenIds.has(currentId)) {
-            return; // skip duplicate elements
-          }
-          seenIds.add(currentId);
-
-          let image = p.image;
-          // 1) /src/assets/images 구버전 경로 들어있으면 적극 치환
-          if (image && image.includes('/src/assets/images')) {
-            image = image.replace('/src/assets/images', '/assets/images');
-          }
-          
-          // 2) 이번에 재생성된 초고화질 신규 레퍼런스 이미지 및 원본 업로드된 유효 이미지 전체 허용 세트
-          const validSet = new Set([
-            '/assets/images/regenerated_image_1781685239299.png',
-            '/assets/images/regenerated_image_1781685912943.png',
-            '/assets/images/regenerated_image_1781685907524.png',
-            '/assets/images/regenerated_image_1781688139818.png',
-            '/assets/images/regenerated_image_1781688142077.png',
-            '/assets/images/uploaded_tank_5_1781683266079.jpg',
-            '/assets/images/uploaded_tank_6_1781683278949.jpg',
-            '/assets/images/uploaded_tank_8_1781683306440.jpg'
-          ]);
-
-          const defaultProduct = PRODUCT_DATA.find((dp) => dp.id === currentId);
-
-          // 만약 이미지가 정의되어 있지 않거나, 구버전 임시 경로이거나, 유효 세트가 아닐 경우 각 제품 카테고리에 맞는 기본 지정값으로 안전 회복
-          if (!image || image.includes('/src/assets/') || !validSet.has(image)) {
-            if (defaultProduct) {
-              image = defaultProduct.image;
-            } else {
-              const idLow = currentId.toLowerCase();
-              const nameLow = (p.name || '').toLowerCase();
-              const catLow = (p.category || '').toLowerCase();
-
-              if (idLow.includes('un-mixer') || idLow.includes('un-2000') || idLow.includes('mixer') || catLow.includes('un_agitation') || nameLow.includes('교반') || nameLow.includes('dosing')) {
-                image = '/assets/images/regenerated_image_1781688139818.png';
-              } else if (idLow.includes('sts') || nameLow.includes('sts') || nameLow.includes('밴드')) {
-                image = '/assets/images/regenerated_image_1781688142077.png';
-              } else if (idLow.includes('deck') || nameLow.includes('deck') || nameLow.includes('데크') || nameLow.includes('사다리')) {
-                image = '/assets/images/regenerated_image_1781685912943.png';
-              } else if (idLow.includes('ud') || idLow.includes('discharge') || catLow.includes('ud_discharge') || nameLow.includes('배출')) {
-                image = '/assets/images/regenerated_image_1781685907524.png';
-              } else {
-                image = '/assets/images/regenerated_image_1781685239299.png';
-              }
+        return PRODUCT_DATA.map((dp) => {
+          // 기존에 저장된 동일 ID의 사용자 편집 데이터를 찾습니다.
+          const edited = parsed.find((p) => p.id === dp.id || (dp.id === 'ug-3000' && p.id === 'ug-standard'));
+          if (edited) {
+            // 카테고리명 보정 (정형화된 세련된 명칭 유지)
+            let categoryName = edited.categoryName || dp.categoryName;
+            if (edited.category === 'UN_AGITATION') {
+              categoryName = 'UN조 탱크';
+            } else if (edited.category === 'DECK_STS') {
+              categoryName = 'STS 보강형 일반 탱크';
+            } else if (edited.category === 'UG_STANDARD') {
+              categoryName = 'UG 보강형 일반 탱크';
+            } else if (edited.category === 'UD_DISCHARGE') {
+              categoryName = 'UD 완전배출 탱크';
             }
-          }
 
-          // 구버전 localStorage에 잘못 저장된 중복된 교반형/데크형 임시 이미지를 본래의 전용(눈금, 사각, 야외사다리) 고유 이미지로 자동 치유합니다.
-          if (defaultProduct) {
-            if (currentId === 'un-standard-tank' && image === '/assets/images/regenerated_image_1781688139818.png') {
-              image = defaultProduct.image;
-            } else if (currentId === 'kid-dosing-tank' && image === '/assets/images/regenerated_image_1781688139818.png') {
-              image = defaultProduct.image;
-            } else if (currentId === 'un-mixed-agitation' && (image === '/assets/images/regenerated_image_1781685912943.png' || image === '/assets/images/regenerated_image_1781688139818.png')) {
-              image = defaultProduct.image;
-            }
-          }
-
-          // Dynamically map/migrate old category names to new clean Korean terms
-          let categoryName = p.categoryName;
-          if (p.category === 'UN_AGITATION') {
-            categoryName = 'UN조 탱크';
-          } else if (p.category === 'DECK_STS') {
-            categoryName = 'STS 보강형 일반 탱크';
-          } else if (p.category === 'UG_STANDARD') {
-            categoryName = 'UG 보강형 일반 탱크';
-          } else if (p.category === 'UD_DISCHARGE') {
-            categoryName = 'UD 완전배출 탱크';
-          }
-
-          if (defaultProduct) {
-            // Merge with default spec records but preserve user's edited values and direct image edits
-            uniqueProducts.push({
-              ...defaultProduct,
-              ...p,
-              id: currentId,
-              image: image,
+            return {
+              ...dp,
+              ...edited,
+              id: dp.id,
+              image: dp.image, // 기본 탑재 고정 정밀 기획 이미지를 100% 무결 보존
               categoryName,
-            });
-          } else {
-            uniqueProducts.push({ ...p, id: currentId, image, categoryName });
+            };
           }
+          return dp;
         });
-        return uniqueProducts;
       } catch (e) {
         console.error('Failed to parse saved products, reverting to default data', e);
         return PRODUCT_DATA;
@@ -501,7 +441,7 @@ export default function App() {
               <div className="space-y-8 animate-in fade-in duration-300">
 
                 {/* 🔧 간편 이미지 및 카탈로그 이지 에디터 (Easy Editor console) */}
-                <div className="bg-slate-900 border border-slate-800 p-5 rounded-2xl shadow-2xl space-y-4 mb-8" id="easy-editor-console">
+                <div className="hidden" id="easy-editor-console">
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-800/80">
                     <div className="flex items-center gap-2.5">
                       <div className="p-2 bg-orange-500/10 text-orange-400 rounded-lg shrink-0">
