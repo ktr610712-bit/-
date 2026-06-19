@@ -151,7 +151,15 @@ export default function App() {
         let hasBrokenPath = false;
         if (Array.isArray(parsed)) {
           for (const p of parsed) {
-            if (p.image && (p.image.includes('/src/') || p.image.includes('/assets/images/assets/'))) {
+            if (p.image && (
+              p.image.includes('/src/') || 
+              p.image.includes('/assets/images/assets/') ||
+              p.image.includes('localhost') ||
+              p.image.includes('ais-dev') ||
+              p.image.includes('ais-pre') ||
+              p.image.includes('googleusercontent') ||
+              (p.image.startsWith('http') && !p.image.includes('ultratank.netlify.app'))
+            )) {
               hasBrokenPath = true;
               break;
             }
@@ -164,7 +172,15 @@ export default function App() {
       }
       
       const savedHero = localStorage.getItem('UW_HERO_IMAGE');
-      if (savedHero && (savedHero.includes('/src/') || savedHero.includes('/assets/images/assets/'))) {
+      if (savedHero && (
+        savedHero.includes('/src/') || 
+        savedHero.includes('/assets/images/assets/') ||
+        savedHero.includes('localhost') ||
+        savedHero.includes('ais-dev') ||
+        savedHero.includes('ais-pre') ||
+        savedHero.includes('googleusercontent') ||
+        (savedHero.startsWith('http') && !savedHero.includes('ultratank.netlify.app'))
+      )) {
         localStorage.removeItem('UW_HERO_IMAGE');
         window.location.reload();
       }
@@ -750,6 +766,25 @@ export default function App() {
                 관리자 권한 확인 및 로그인
               </button>
             </form>
+
+            <div className="mt-5 pt-4 border-t border-slate-100 text-center space-y-2">
+              <span className="text-[10px] text-slate-400 block font-medium leading-normal">
+                혹시 브라우저에 구버전 임시데이터나 깨진 이미지(엑박)가 남아있나요?
+              </span>
+              <button
+                type="button"
+                onClick={() => {
+                  if (window.confirm("기존 브라우저 로컬 캐시(로컬스토리지)에 저장되었던 이미지와 커스텀 수정 데이터를 최신 오렌지-철재 보강 밴드형 정밀 사진과 제품 목록으로 전부 원천 초기화(Reset)하여 복구하시겠습니까?\n\n이 작업은 깨진 이미지 엑박 현상을 즉시 정형화 해결하고 화면을 리프레시합니다.")) {
+                    localStorage.clear();
+                    window.location.reload();
+                  }
+                }}
+                className="inline-flex items-center gap-1.5 justify-center w-full bg-slate-100 hover:bg-slate-200 text-slate-700 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer border border-slate-200/50"
+              >
+                <RefreshCw className="w-3.5 h-3.5 text-slate-500 animate-spin-slow" />
+                데이터 및 캐시 완전 복원 (Reset Cache)
+              </button>
+            </div>
           </div>
         </div>
       )}

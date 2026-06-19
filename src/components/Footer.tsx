@@ -45,10 +45,22 @@ export default function Footer() {
               전화번호 : <strong className="text-slate-300">055-385-2696</strong> | 팩스 : <strong className="text-slate-300">055-385-2698</strong> | 전자우편 : <strong className="text-slate-300">ultfine@naver.com</strong>
             </p>
           </div>
-          <div className="md:text-right flex flex-col justify-end">
+          <div className="md:text-right flex flex-col justify-end items-start md:items-end gap-1.5">
             <p className="font-semibold text-[10px] text-slate-500">
-              Copyright ⓒ <strong>ULTRA WORLD Co., Ltd.</strong> All Rights Reserved.
+              Copyright ⓒ <strong className="text-slate-400">ULTRA WORLD Co., Ltd.</strong> All Rights Reserved.
             </p>
+            <button 
+              onClick={() => {
+                if (window.confirm("기존 브라우저 로컬 캐시(로컬스토리지)에 저장되었던 이미지와 커스텀 수정 데이터를 최신 고화질 정밀 사진과 제품 목록으로 전부 원천 초기화(Reset)하여 복구하시겠습니까?\n\n이 작업은 깨진 이미지 엑박 현상을 즉시 정형화 해결하고 화면을 리프레시합니다.")) {
+                  localStorage.clear();
+                  window.location.reload();
+                }
+              }}
+              className="text-[10px] text-slate-500 hover:text-orange-400 underline cursor-pointer transition-colors"
+              title="데이터 및 캐시 완전 복원"
+            >
+              데이터 및 캐시 완전 복원 (Reset Cache)
+            </button>
           </div>
         </div>
       </div>
