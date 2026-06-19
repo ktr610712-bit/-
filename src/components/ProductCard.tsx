@@ -6,6 +6,7 @@
 import React from 'react';
 import { Eye, Info, HelpCircle, Edit2, Trash2 } from 'lucide-react';
 import { Product } from '../types';
+import { resolveAssetPath } from '../utils';
 
 interface ProductCardProps {
   key?: React.Key;
@@ -31,7 +32,7 @@ export default function ProductCard({
       {/* Product Image Stage */}
       <div className="relative aspect-video sm:aspect-square bg-slate-50 overflow-hidden border-b border-slate-100 flex items-center justify-center">
         <img
-          src={product.image}
+          src={resolveAssetPath(product.image)}
           alt={product.name}
           className="w-full h-full object-cover transition-transform duration-300"
           referrerPolicy="no-referrer"

@@ -6,6 +6,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { PRODUCT_DATA, INITIAL_INQUIRIES } from './data';
 import { Product, Category, Inquiry } from './types';
+import { resolveAssetPath } from './utils';
 import { 
   CHEMICAL_RESISTANCE_DATA, 
   UN_KID_SPEC_DATA, 
@@ -152,13 +153,13 @@ export default function App() {
         if (Array.isArray(parsed)) {
           for (const p of parsed) {
             if (p.image && (
-              p.image.includes('/src/') || 
               p.image.includes('/assets/images/assets/') ||
-              p.image.includes('localhost') ||
-              p.image.includes('ais-dev') ||
-              p.image.includes('ais-pre') ||
               p.image.includes('googleusercontent') ||
-              (p.image.startsWith('http') && !p.image.includes('ultratank.netlify.app'))
+              (p.image.startsWith('http') && 
+               !p.image.includes('ultratank.netlify.app') && 
+               !p.image.includes('ais-dev') && 
+               !p.image.includes('ais-pre') && 
+               !p.image.includes('localhost'))
             )) {
               hasBrokenPath = true;
               break;
@@ -167,22 +168,22 @@ export default function App() {
         }
         if (hasBrokenPath) {
           localStorage.removeItem('UW_PRODUCTS_V2'); // Purge corrupted local storage cache
-          window.location.reload();
+          setProducts(PRODUCT_DATA);
         }
       }
       
       const savedHero = localStorage.getItem('UW_HERO_IMAGE');
       if (savedHero && (
-        savedHero.includes('/src/') || 
         savedHero.includes('/assets/images/assets/') ||
-        savedHero.includes('localhost') ||
-        savedHero.includes('ais-dev') ||
-        savedHero.includes('ais-pre') ||
         savedHero.includes('googleusercontent') ||
-        (savedHero.startsWith('http') && !savedHero.includes('ultratank.netlify.app'))
+        (savedHero.startsWith('http') && 
+         !savedHero.includes('ultratank.netlify.app') && 
+         !savedHero.includes('ais-dev') && 
+         !savedHero.includes('ais-pre') && 
+         !savedHero.includes('localhost'))
       )) {
         localStorage.removeItem('UW_HERO_IMAGE');
-        window.location.reload();
+        setHeroImageUrl('/assets/images/regenerated_image_1781685239299.png');
       }
     } catch (e) {
       console.error('Storage sanitizer helper error:', e);
@@ -458,7 +459,7 @@ export default function App() {
           onConsultClick={() => setCurrentTab('consult')} 
           heroBadgeText={heroBadgeText}
           onEditHeroBadgeText={handleOpenBadgeEdit}
-          heroImageUrl={heroImageUrl}
+          heroImageUrl={resolveAssetPath(heroImageUrl)}
           onEditHeroImageUrl={handleOpenImageEdit}
           isAdmin={isAdmin}
         />
@@ -1002,7 +1003,7 @@ export default function App() {
                       }`}
                     >
                       <div className="w-full h-8 bg-slate-150 rounded overflow-hidden mb-1 pointer-events-none">
-                        <img src={preset.img} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                        <img src={resolveAssetPath(preset.img)} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
                       </div>
                       <span className="block truncate text-[8px] leading-tight font-medium">{preset.label}</span>
                     </button>
@@ -1199,7 +1200,7 @@ export default function App() {
                     {/* Visual representative tank */}
                     <div className="relative rounded-xl overflow-hidden border-4 border-slate-850 h-64 shadow-2xl bg-slate-800">
                       <img 
-                        src="/assets/images/catalogue_hero_image_1781672372152.jpg" 
+                        src={resolveAssetPath('/assets/images/catalogue_hero_image_1781672372152.jpg')} 
                         alt="울트라 화학 탱크 대표" 
                         className="w-full h-full object-cover"
                       />

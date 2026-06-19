@@ -5,32 +5,42 @@
 
 import { Product, Inquiry } from './types';
 
+// Import image assets explicitly so Vite can bundle them and generate robust paths in the production build
+import ugImg from './assets/images/regenerated_image_1781685239299.png';
+import unImg from './assets/images/regenerated_image_1781688139818.png';
+import deckImg from './assets/images/regenerated_image_1781685912943.png';
+import udImg from './assets/images/regenerated_image_1781685907524.png';
+import smallImg from './assets/images/uploaded_tank_5_1781683266079.jpg';
+import kidImg from './assets/images/uploaded_tank_6_1781683278949.jpg';
+import stsImg from './assets/images/regenerated_image_1781688142077.png';
+import deckLadderImg from './assets/images/uploaded_tank_8_1781683306440.jpg';
+
 // Let's resolve the actual image URLs we generated.
 // Mapping the uploaded raw original images to their correct product labels
 const images = {
   // 01. UG 주황 철재거치 -> 사용자가 제공한 새로운 고화질 이미지 적용 (1번)
-  ug: '/assets/images/regenerated_image_1781685239299.png',
+  ug: ugImg,
   
   // 09. UN형 고화질 교반탱크 적용 (9번으로 대체)
-  un: '/assets/images/regenerated_image_1781688139818.png',
+  un: unImg,
   
   // 03. 안전 가드데크 사다리 -> 고화질 재생성 파일 적용 (3번)
-  deck: '/assets/images/regenerated_image_1781685912943.png',
+  deck: deckImg,
   
   // 04. 공장 거치형 주황보강 -> 고화질 재생성 파일 적용 (4번)
-  ud: '/assets/images/regenerated_image_1781685907524.png',
+  ud: udImg,
   
   // 05. UN120 눈금 백색원형 (Cylindrical container with graduation lines and UN120 print)
-  small: '/assets/images/uploaded_tank_5_1781683266079.jpg',
+  small: smallImg,
   
   // 06. 사각 도징용 백색탱크 (White square dosing container with white lid)
-  kid: '/assets/images/uploaded_tank_6_1781683278949.jpg',
+  kid: kidImg,
   
   // 10. STS보강 고화질 탱크 -> 고화질 재생성 파일 적용 (10번)
-  sts: '/assets/images/regenerated_image_1781688142077.png',
+  sts: stsImg,
   
   // 08. 야외 주황 가드 사다리 (Orange tank safety frame and yellow cage ladder inside facility)
-  deck_ladder: '/assets/images/uploaded_tank_8_1781683306440.jpg',
+  deck_ladder: deckLadderImg,
 };
 
 export const PRODUCT_DATA: Product[] = [
