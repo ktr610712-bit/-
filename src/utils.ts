@@ -17,8 +17,9 @@ import catalogueHero from './assets/images/catalogue_hero_image_1781672372152.jp
  */
 export const resolveAssetPath = (pathStr: string): string => {
   if (!pathStr) return '';
-  const cleanPath = pathStr.replace('/assets/images/', '');
-  switch (cleanPath) {
+  // Extract only the filename from the path to guarantee matching regardless of /src/ or arbitrary prefixes
+  const filename = pathStr.substring(pathStr.lastIndexOf('/') + 1);
+  switch (filename) {
     case 'regenerated_image_1781685239299.png': return regImage1;
     case 'regenerated_image_1781685912943.png': return regImage2;
     case 'regenerated_image_1781685907524.png': return regImage3;
