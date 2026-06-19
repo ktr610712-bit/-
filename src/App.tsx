@@ -33,7 +33,7 @@ export default function App() {
   // Admin authentication state
   const [isAdmin, setIsAdmin] = useState<boolean>(() => {
     const saved = localStorage.getItem('UW_IS_ADMIN');
-    return saved === null ? true : saved === 'true';
+    return saved === null ? false : saved === 'true';
   });
 
   // Admin Login Modal States
@@ -143,6 +143,36 @@ export default function App() {
   const sliderRef = useRef<HTMLDivElement>(null);
 
   // Synchronize dynamic lists to storage
+  useEffect(() => {
+    try {
+      const savedProducts = localStorage.getItem('UW_PRODUCTS_V2');
+      if (savedProducts) {
+        const parsed = JSON.parse(savedProducts);
+        let hasBrokenPath = false;
+        if (Array.isArray(parsed)) {
+          for (const p of parsed) {
+            if (p.image && (p.image.includes('/src/') || p.image.includes('/assets/images/assets/'))) {
+              hasBrokenPath = true;
+              break;
+            }
+          }
+        }
+        if (hasBrokenPath) {
+          localStorage.removeItem('UW_PRODUCTS_V2'); // Purge corrupted local storage cache
+          window.location.reload();
+        }
+      }
+      
+      const savedHero = localStorage.getItem('UW_HERO_IMAGE');
+      if (savedHero && (savedHero.includes('/src/') || savedHero.includes('/assets/images/assets/'))) {
+        localStorage.removeItem('UW_HERO_IMAGE');
+        window.location.reload();
+      }
+    } catch (e) {
+      console.error('Storage sanitizer helper error:', e);
+    }
+  }, []);
+
   useEffect(() => {
     localStorage.setItem('UW_PRODUCTS_V2', JSON.stringify(products));
   }, [products]);
@@ -441,7 +471,8 @@ export default function App() {
               <div className="space-y-8 animate-in fade-in duration-300">
 
                 {/* 🔧 간편 이미지 및 카탈로그 이지 에디터 (Easy Editor console) */}
-                <div className="hidden" id="easy-editor-console">
+                {isAdmin && (
+                  <div className="bg-slate-900/60 rounded-2xl p-5 border border-slate-800 space-y-4 mb-6 shadow-xl backdrop-blur-sm" id="easy-editor-console">
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-800/80">
                     <div className="flex items-center gap-2.5">
                       <div className="p-2 bg-orange-500/10 text-orange-400 rounded-lg shrink-0">
@@ -551,6 +582,7 @@ export default function App() {
                     </div>
                   </div>
                 </div>
+                )}
                 
                 {/* Product Search Filtering HUD status */}
                 {searchQuery && (
