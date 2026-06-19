@@ -59,9 +59,9 @@ export default function App() {
       '/assets/images/regenerated_image_1781685907524.png',
       '/assets/images/regenerated_image_1781688139818.png',
       '/assets/images/regenerated_image_1781688142077.png',
-      '/assets/images/uploaded_tank_5_1781683266079.jpg',
-      '/assets/images/uploaded_tank_6_1781683278949.jpg',
-      '/assets/images/uploaded_tank_8_1781683306440.jpg'
+      '/assets/images/uploaded_tank_5_1781683266079.png',
+      '/assets/images/uploaded_tank_6_1781683278949.png',
+      '/assets/images/uploaded_tank_8_1781683306440.png'
     ]);
 
     if (saved && validHeroSet.has(saved)) {
@@ -568,13 +568,13 @@ export default function App() {
                        <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 mt-2">
                          {[
                            { label: '01. UG 오렌지 철재거치', url: '/assets/images/regenerated_image_1781685239299.png' },
-                           { label: '02. 사각 도징용 백색', url: '/assets/images/uploaded_tank_6_1781683278949.jpg' },
+                           { label: '02. 사각 도징용 백색', url: '/assets/images/uploaded_tank_6_1781683278949.png' },
                            { label: '03. 안전 가드데크 사다리', url: '/assets/images/regenerated_image_1781685912943.png' },
                            { label: '04. 공장 거치형 주황보강', url: '/assets/images/regenerated_image_1781685907524.png' },
                            { label: '05. 소형 백색 주입용', url: '/assets/images/uploaded_tank_2_1781683222315.jpg' },
-                           { label: '06. UN120 눈금 백색원형', url: '/assets/images/uploaded_tank_5_1781683266079.jpg' },
+                           { label: '06. UN120 눈금 백색원형', url: '/assets/images/uploaded_tank_5_1781683266079.png' },
                            { label: '07. 광택 STS 보강 밴드', url: '/assets/images/uploaded_tank_7_1781683291987.jpg' },
-                           { label: '08. 야외 주황 가드 사다리', url: '/assets/images/uploaded_tank_8_1781683306440.jpg' },
+                           { label: '08. 야외 주황 가드 사다리', url: '/assets/images/uploaded_tank_8_1781683306440.png' },
                          ].map((preset, index) => {
                            const isCurrent = heroImageUrl === preset.url;
                            return (
@@ -883,13 +883,13 @@ export default function App() {
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
                   {[
                     { label: '01. UG 오렌지 철재거치', url: '/assets/images/regenerated_image_1781685239299.png' },
-                    { label: '02. 사각 도징용 백색', url: '/assets/images/uploaded_tank_6_1781683278949.jpg' },
+                    { label: '02. 사각 도징용 백색', url: '/assets/images/uploaded_tank_6_1781683278949.png' },
                     { label: '03. 안전 가드데크 사다리', url: '/assets/images/regenerated_image_1781685912943.png' },
                     { label: '04. 공장 거치형 주황보강', url: '/assets/images/regenerated_image_1781685907524.png' },
                     { label: '05. 소형 백색 주입용', url: '/assets/images/uploaded_tank_2_1781683222315.jpg' },
-                    { label: '06. UN120 눈금 백색원형', url: '/assets/images/uploaded_tank_5_1781683266079.jpg' },
+                    { label: '06. UN120 눈금 백색원형', url: '/assets/images/uploaded_tank_5_1781683266079.png' },
                     { label: '07. 광택 STS 보강 밴드', url: '/assets/images/uploaded_tank_7_1781683291987.jpg' },
-                    { label: '08. 야외 주황 가드 사다리', url: '/assets/images/uploaded_tank_8_1781683306440.jpg' },
+                    { label: '08. 야외 주황 가드 사다리', url: '/assets/images/uploaded_tank_8_1781683306440.png' },
                   ].map((preset, index) => (
                     <button
                       key={index}
@@ -988,9 +988,9 @@ export default function App() {
                     { label: '03. 공장 거치형 주황보강', img: '/assets/images/regenerated_image_1781685907524.png' },
                     { label: '04. UN형 고화질 교반탱크', img: '/assets/images/regenerated_image_1781688139818.png' },
                     { label: '05. STS보강 고화질 탱크', img: '/assets/images/regenerated_image_1781688142077.png' },
-                    { label: '06. UN120 눈금 백색원형', img: '/assets/images/uploaded_tank_5_1781683266079.jpg' },
-                    { label: '07. 사각 도징용 백색탱크', img: '/assets/images/uploaded_tank_6_1781683278949.jpg' },
-                    { label: '08. 야외 주황 가드 사다리', img: '/assets/images/uploaded_tank_8_1781683306440.jpg' },
+                    { label: '06. UN120 눈금 백색원형', img: '/assets/images/uploaded_tank_5_1781683266079.png' },
+                    { label: '07. 사각 도징용 백색탱크', img: '/assets/images/uploaded_tank_6_1781683278949.png' },
+                    { label: '08. 야외 주황 가드 사다리', img: '/assets/images/uploaded_tank_8_1781683306440.png' },
                   ].map((preset) => (
                     <button
                       key={preset.label}
