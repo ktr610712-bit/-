@@ -24,6 +24,67 @@ export default function ProductCard({
   onEditProduct, 
   onDeleteProduct 
 }: ProductCardProps) {
+  const initialSrc = resolveAssetPath(product.image);
+  const [imgSrc, setImgSrc] = React.useState<string>(initialSrc);
+  const [retryState, setRetryState] = React.useState<number>(0);
+
+  React.useEffect(() => {
+    setImgSrc(resolveAssetPath(product.image));
+    setRetryState(0);
+  }, [product.image]);
+
+  const handleImgError = () => {
+    if (retryState === 0) {
+      // First fallback: attempt direct clean public static path under /assets/images/
+      // This bypasses any hashing or bundler-specific resolution.
+      const rawPath = product.image || '';
+      const lastSlashIdx = rawPath.lastIndexOf('/');
+      const filenameWithHash = lastSlashIdx !== -1 ? rawPath.substring(lastSlashIdx + 1) : rawPath;
+      
+      // Separate base filename from any vite hash and extension
+      // E.g., uploaded_tank_5_1781683266079-Dwl6ZNCl.jpg -> uploaded_tank_5_1781683266079.jpg
+      let cleanFilename = filenameWithHash;
+      if (filenameWithHash.includes('-')) {
+        const parts = filenameWithHash.split('-');
+        const hashAndExt = parts[parts.length - 1]; // e.g. Dwl6ZNCl.jpg
+        const extIdx = hashAndExt.lastIndexOf('.');
+        const ext = extIdx !== -1 ? hashAndExt.substring(extIdx) : '.jpg';
+        parts.pop(); // remove hash and extension part
+        cleanFilename = parts.join('-') + ext;
+      }
+      
+      // Fallback path in public directory
+      const publicFallback = `/assets/images/${cleanFilename}`;
+      setImgSrc(publicFallback);
+      setRetryState(1);
+    } else if (retryState === 1) {
+      // Second fallback: Handle case sensitivity differences for extensions (e.g. .jpg <=> .JPG, .png <=> .PNG)
+      const current = imgSrc;
+      if (current.toLowerCase().endsWith('.jpg')) {
+        const base = current.substring(0, current.lastIndexOf('.'));
+        const newExt = current.endsWith('.jpg') ? '.JPG' : '.jpg';
+        setImgSrc(base + newExt);
+      } else if (current.toLowerCase().endsWith('.png')) {
+        const base = current.substring(0, current.lastIndexOf('.'));
+        const newExt = current.endsWith('.png') ? '.PNG' : '.png';
+        setImgSrc(base + newExt);
+      } else {
+        setImgSrc('/assets/images/regenerated_image_1781685239299.png');
+      }
+      setRetryState(2);
+    } else if (retryState === 2) {
+      // Third fallback: Handle case differences for the filename itself or directory
+      const rawPath = product.image || '';
+      const fn = rawPath.substring(rawPath.lastIndexOf('/') + 1).toLowerCase();
+      setImgSrc(`/assets/images/${fn}`);
+      setRetryState(3);
+    } else if (retryState === 3) {
+      // Fourth fallback: fallback to a guaranteed high-resolution working PNG asset
+      setImgSrc('/assets/images/regenerated_image_1781685239299.png');
+      setRetryState(4);
+    }
+  };
+
   return (
     <div 
       className="bg-white rounded-xl shadow-xs border border-slate-200 overflow-hidden group flex flex-col h-full transition-all duration-200 hover:-translate-y-0.5 hover:border-orange-500 hover:shadow-md relative"
@@ -32,10 +93,11 @@ export default function ProductCard({
       {/* Product Image Stage */}
       <div className="relative aspect-video sm:aspect-square bg-slate-50 overflow-hidden border-b border-slate-100 flex items-center justify-center">
         <img
-          src={resolveAssetPath(product.image)}
+          src={imgSrc}
           alt={product.name}
           className="w-full h-full object-cover transition-transform duration-300"
           referrerPolicy="no-referrer"
+          onError={handleImgError}
         />
         
         {/* New product indicator - disabled per user request */}
