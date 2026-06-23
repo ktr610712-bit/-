@@ -1200,7 +1200,7 @@ export default function App() {
                     {/* Visual representative tank */}
                     <div className="relative rounded-xl overflow-hidden border-4 border-slate-850 h-64 shadow-2xl bg-slate-800">
                       <img 
-                        src={resolveAssetPath('/assets/images/catalogue_hero_image_1781672372152.jpg')} 
+                        src={resolveAssetPath(heroImageUrl)} 
                         alt="울트라 화학 탱크 대표" 
                         className="w-full h-full object-cover"
                       />
