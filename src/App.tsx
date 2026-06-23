@@ -1151,7 +1151,7 @@ export default function App() {
                 { title: '1. 카달로그 표지', icon: BookOpen },
                 { title: '2. UG 일반형 규격표', icon: Eye },
                 { title: '3. 정밀 내약품성 사전', icon: ShieldCheck },
-                { title: '4. 교반형 규격표', icon: Info },
+                { title: '4. UN조 규격표', icon: Info },
                 { title: '5. 설치 보강 주의사항', icon: AlertTriangle },
               ].map((tab, idx) => {
                 const isActive = catalogueTab === idx;
@@ -1407,71 +1407,46 @@ export default function App() {
               {/* PAGE 4: UN / KID AGITATION SMALL SPEC */}
               {catalogueTab === 3 && (
                 <div className="space-y-4 animate-in fade-in duration-200">
-                  <div className="bg-slate-900 text-white rounded-xl p-5 border border-slate-950 space-y-1.5 shadow-sm">
+                  <div className="bg-slate-900 text-white rounded-xl p-4 border border-slate-950 shadow-sm">
                     <h4 className="font-extrabold text-xs text-orange-400">UN형 / KID형 울트라 약정량 소형탱크 규격표</h4>
-                    <p className="text-[11px] text-slate-300 leading-relaxed">
-                      상부 구동 전기 기어모터 교반 지탱 프레임 가설대 장착에 안심 대응 설계된 교반 전용 소형 탱크 군입니다. 
-                      각종 도징(Dosing) 및 수처리 중화 가동 반응 용도로 장기 안심 수납 대응합니다.
-                    </p>
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
-                    <div className="overflow-x-auto border border-slate-150 rounded-xl bg-white shadow-2xs">
-                      <table className="w-full text-left border-collapse text-[11px]">
-                        <thead>
-                          <tr className="bg-slate-100 text-slate-700 font-extrabold border-b border-slate-200">
-                            <th className="p-3">품명 (Model)</th>
-                            <th className="p-3">용량 (L)</th>
-                            <th className="p-3">외경 (mm)</th>
-                            <th className="p-3">전고 (mm)</th>
-                            <th className="p-3">두께 (t)</th>
-                            <th className="p-3 text-center">도면견적</th>
+                  <div className="overflow-x-auto border border-slate-150 rounded-xl bg-white shadow-2xs">
+                    <table className="w-full text-left border-collapse text-[11px]">
+                      <thead>
+                        <tr className="bg-slate-100 text-slate-700 font-extrabold border-b border-slate-200">
+                          <th className="p-3">품명 (Model)</th>
+                          <th className="p-3">용량 (L)</th>
+                          <th className="p-3">외경 (mm)</th>
+                          <th className="p-3">전고 (mm)</th>
+                          <th className="p-3">두께 (t)</th>
+                          <th className="p-3 text-center">도면견적</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-100 font-mono text-slate-600">
+                        {UN_KID_SPEC_DATA.map((rec) => (
+                          <tr key={rec.model} className="hover:bg-slate-50 transition-colors">
+                            <td className="p-3 font-extrabold text-slate-800">{rec.model}</td>
+                            <td className="p-3 font-bold text-slate-900">{rec.capacity}</td>
+                            <td className="p-3">{rec.diameter}</td>
+                            <td className="p-3">{rec.height}</td>
+                            <td className="p-3 text-orange-600 font-bold">{rec.thickness}mm</td>
+                            <td className="p-3 text-center">
+                              <button 
+                                onClick={() => {
+                                  setShowCatalogueModal(false);
+                                  setPrefilledQuoteProduct(`소형교반형 ${rec.model} (${rec.capacity})`);
+                                  setCurrentTab('consult');
+                                }}
+                                className="bg-slate-900 text-white font-extrabold px-1.5 py-1 rounded text-[9px] hover:bg-orange-500 cursor-pointer transition-all"
+                              >
+                                전송문의
+                              </button>
+                            </td>
                           </tr>
-                        </thead>
-                        <tbody className="divide-y divide-slate-100 font-mono text-slate-600">
-                          {UN_KID_SPEC_DATA.map((rec) => (
-                            <tr key={rec.model} className="hover:bg-slate-50 transition-colors">
-                              <td className="p-3 font-extrabold text-slate-800">{rec.model}</td>
-                              <td className="p-3 font-bold text-slate-900">{rec.capacity}</td>
-                              <td className="p-3">{rec.diameter}</td>
-                              <td className="p-3">{rec.height}</td>
-                              <td className="p-3 text-orange-600 font-bold">{rec.thickness}mm</td>
-                              <td className="p-3 text-center">
-                                <button 
-                                  onClick={() => {
-                                    setShowCatalogueModal(false);
-                                    setPrefilledQuoteProduct(`소형교반형 ${rec.model} (${rec.capacity})`);
-                                    setCurrentTab('consult');
-                                  }}
-                                  className="bg-slate-900 text-white font-extrabold px-1.5 py-1 rounded text-[9px] hover:bg-orange-500 cursor-pointer transition-all"
-                                >
-                                  전송문의
-                                </button>
-                              </td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-
-                    <div className="space-y-3">
-                      <div className="bg-white rounded-xl border border-slate-200 p-4 space-y-2">
-                        <h5 className="font-extrabold text-xs text-slate-900 flex items-center gap-1.5">
-                          <CheckCircle2 className="w-4 h-4 text-orange-500" /> UN형 (원형 소화조 장탈형)
-                        </h5>
-                        <p className="text-[11px] text-slate-500 leading-normal">
-                          상부에 안전 점검용 스크류 뚜껑(Manhole) 및 모터 구동 지지 플레이트를 취부 성형하여 흔들림과 진동 자극을 기하학적으로 극소화하였습니다.
-                        </p>
-                      </div>
-                      <div className="bg-white rounded-xl border border-slate-200 p-4 space-y-2">
-                        <h5 className="font-extrabold text-xs text-slate-900 flex items-center gap-1.5">
-                          <CheckCircle2 className="w-4 h-4 text-orange-500" /> KID형 (사각 도징 컴팩트형)
-                        </h5>
-                        <p className="text-[11px] text-slate-500 leading-normal">
-                          정사각형 가로 형률 구조로 협소한 기계실, 수처리 배관 지하실 협로 통과가 지극히 간편하며 안정적으로 다단 배치가 완성됩니다.
-                        </p>
-                      </div>
-                    </div>
+                        ))}
+                      </tbody>
+                    </table>
                   </div>
                 </div>
               )}
