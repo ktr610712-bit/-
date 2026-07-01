@@ -5,10 +5,10 @@ import regImage4 from './assets/images/regenerated_image_1781688139818.png';
 import regImage5 from './assets/images/regenerated_image_1781688142077.png';
 import uploaded1 from './assets/images/uploaded_tank_1_1781683205180.jpg';
 import uploaded2 from './assets/images/uploaded_tank_2_1781683222315.jpg';
-import uploaded5 from './assets/images/uploaded_tank_5_1781683266079.png';
-import uploaded6 from './assets/images/uploaded_tank_6_1781683278949.png';
+import uploaded5 from './assets/images/uploaded_tank_5_1781683266079.jpg';
+import uploaded6 from './assets/images/uploaded_tank_6_1781683278949.jpg';
 import uploaded7 from './assets/images/uploaded_tank_7_1781683291987.jpg';
-import uploaded8 from './assets/images/uploaded_tank_8_1781683306440.png';
+import uploaded8 from './assets/images/uploaded_tank_8_1781683306440.jpg';
 import ugStandard from './assets/images/ug_standard_tank_1781660874171.jpg';
 import catalogueHero from './assets/images/catalogue_hero_image_1781672372152.jpg';
 
