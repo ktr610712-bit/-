@@ -26,6 +26,41 @@ import Footer from './components/Footer';
 import { ChevronLeft, ChevronRight, Plus, X, Lock, ShieldCheck, Edit, Trash2, BookOpen, AlertTriangle, Eye, CheckCircle2, XCircle, Info, Settings, RefreshCw, Upload } from 'lucide-react';
 
 export default function App() {
+  // Custom Confirmation Dialog State (replacing window.confirm which is blocked in sandboxed frames)
+  const [customConfirm, setCustomConfirm] = useState<{
+    isOpen: boolean;
+    title: string;
+    message: string;
+    onConfirm: () => void;
+    confirmText?: string;
+    cancelText?: string;
+  }>({
+    isOpen: false,
+    title: '',
+    message: '',
+    onConfirm: () => {},
+  });
+
+  const triggerConfirm = (
+    title: string,
+    message: string,
+    onConfirm: () => void,
+    confirmText = '확인',
+    cancelText = '취소'
+  ) => {
+    setCustomConfirm({
+      isOpen: true,
+      title,
+      message,
+      onConfirm: () => {
+        onConfirm();
+        setCustomConfirm((prev) => ({ ...prev, isOpen: false }));
+      },
+      confirmText,
+      cancelText,
+    });
+  };
+
   // Navigation & Page Tabs
   const [currentTab, setCurrentTab] = useState<string>('home');
   const [selectedCategory, setSelectedCategory] = useState<Category>('ALL');
@@ -252,11 +287,15 @@ export default function App() {
   // Admin login trigger handler
   const handleAdminTrigger = () => {
     if (isAdmin) {
-      if (window.confirm('관리자 권한을 해제하고 로그아웃 하시겠습니까?')) {
-        setIsAdmin(false);
-        setLoginId('');
-        setLoginPw('');
-      }
+      triggerConfirm(
+        '관리자 로그아웃',
+        '관리자 권한을 해제하고 로그아웃 하시겠습니까?',
+        () => {
+          setIsAdmin(false);
+          setLoginId('');
+          setLoginPw('');
+        }
+      );
     } else {
       setLoginId('');
       setLoginPw('');
@@ -282,9 +321,13 @@ export default function App() {
   };
 
   const handleDeleteInquiry = (inquiryId: string) => {
-    if (window.confirm('이 견적 상담 문의를 정말 삭제하시겠습니까?')) {
-      setInquiries((prev) => prev.filter((inq) => inq.id !== inquiryId));
-    }
+    triggerConfirm(
+      '견적 상담 삭제',
+      '이 견적 상담 문의를 정말 삭제하시겠습니까?',
+      () => {
+        setInquiries((prev) => prev.filter((inq) => inq.id !== inquiryId));
+      }
+    );
   };
 
   const handleUpdateInquiryStatus = (inquiryId: string, newStatus: '접수대기' | '검토중' | '답변완료') => {
@@ -296,9 +339,13 @@ export default function App() {
   // Product Delete handler
   const handleDeleteProduct = (productId: string, e: React.MouseEvent) => {
     e.stopPropagation();
-    if (window.confirm('정말로 이 제품을 카탈로그에서 삭제하시겠습니까? 관련 규격 스펙 목록에서도 모두 제거됩니다.')) {
-      setProducts((prev) => prev.filter((p) => p.id !== productId));
-    }
+    triggerConfirm(
+      '제품 삭제',
+      '정말로 이 제품을 카탈로그에서 삭제하시겠습니까? 관련 규격 스펙 목록에서도 모두 제거됩니다.',
+      () => {
+        setProducts((prev) => prev.filter((p) => p.id !== productId));
+      }
+    );
   };
 
   // Product Create or Edit Submit
@@ -633,10 +680,14 @@ export default function App() {
                     {/* 데이터 완전 초기화 */}
                     <button
                       onClick={() => {
-                        if (window.confirm("기존 브라우저 로컬 캐시(로컬스토리지)에 저장되었던 이미지와 커스텀 수정 데이터를 최신 오렌지-철재 보강 밴드형 정밀 사진과 제품 목록으로 전부 정화(Reset)하여 적용하시겠습니까?\n\n이 클릭은 충돌하는 데이터 설정을 완전히 정형화하고 화면을 리프레시합니다.")) {
-                          localStorage.clear();
-                          window.location.reload();
-                        }
+                        triggerConfirm(
+                          "데이터 및 캐시 완전 복원(Reset)",
+                          "기존 브라우저 로컬 캐시(로컬스토리지)에 저장되었던 이미지와 커스텀 수정 데이터를 최신 오렌지-철재 보강 밴드형 정밀 사진과 제품 목록으로 전부 정화(Reset)하여 적용하시겠습니까?\n\n이 클릭은 충돌하는 데이터 설정을 완전히 정형화하고 화면을 리프레시합니다.",
+                          () => {
+                            localStorage.clear();
+                            window.location.reload();
+                          }
+                        );
                       }}
                       className="inline-flex items-center gap-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all shrink-0 cursor-pointer border border-slate-700/60"
                     >
@@ -822,7 +873,14 @@ export default function App() {
       </main>
 
       {/* 4. Footer Corporate Information section */}
-      <Footer />
+      <Footer onResetCache={() => triggerConfirm(
+        "데이터 및 캐시 완전 복원",
+        "기존 브라우저 로컬 캐시(로컬스토리지)에 저장되었던 이미지와 커스텀 수정 데이터를 최신 고화질 정밀 사진과 제품 목록으로 전부 원천 초기화(Reset)하여 복구하시겠습니까?\n\n이 작업은 깨진 이미지 엑박 현상을 즉시 정형화 해결하고 화면을 리프레시합니다.",
+        () => {
+          localStorage.clear();
+          window.location.reload();
+        }
+      )} />
 
       {/* ======================================================= */}
       {/* ADMIN LEVEL SYSTEM MODALS */}
@@ -895,10 +953,14 @@ export default function App() {
               <button
                 type="button"
                 onClick={() => {
-                  if (window.confirm("기존 브라우저 로컬 캐시(로컬스토리지)에 저장되었던 이미지와 커스텀 수정 데이터를 최신 오렌지-철재 보강 밴드형 정밀 사진과 제품 목록으로 전부 원천 초기화(Reset)하여 복구하시겠습니까?\n\n이 작업은 깨진 이미지 엑박 현상을 즉시 정형화 해결하고 화면을 리프레시합니다.")) {
-                    localStorage.clear();
-                    window.location.reload();
-                  }
+                  triggerConfirm(
+                    "데이터 및 캐시 완전 복원",
+                    "기존 브라우저 로컬 캐시(로컬스토리지)에 저장되었던 이미지와 커스텀 수정 데이터를 최신 오렌지-철재 보강 밴드형 정밀 사진과 제품 목록으로 전부 원천 초기화(Reset)하여 복구하시겠습니까?\n\n이 작업은 깨진 이미지 엑박 현상을 즉시 정형화 해결하고 화면을 리프레시합니다.",
+                    () => {
+                      localStorage.clear();
+                      window.location.reload();
+                    }
+                  );
                 }}
                 className="inline-flex items-center gap-1.5 justify-center w-full bg-slate-100 hover:bg-slate-200 text-slate-700 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer border border-slate-200/50"
               >
@@ -1723,6 +1785,39 @@ export default function App() {
               </div>
             </div>
 
+          </div>
+        </div>
+      )}
+
+      {/* C. Custom Confirmation Dialog (Bypasses browser window.confirm sandbox blocks) */}
+      {customConfirm.isOpen && (
+        <div className="fixed inset-0 bg-slate-950/70 flex items-center justify-center z-250 p-4 backdrop-blur-sm animate-fade-in">
+          <div className="bg-white rounded-2xl max-w-md w-full border border-slate-200 shadow-2xl overflow-hidden animate-in zoom-in-95 duration-150">
+            <div className="p-6 space-y-4">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-orange-50 text-orange-600 rounded-full flex items-center justify-center shrink-0">
+                  <AlertTriangle className="w-5 h-5 animate-pulse" />
+                </div>
+                <h3 className="font-extrabold text-slate-900 text-base">{customConfirm.title}</h3>
+              </div>
+              <div className="text-slate-600 text-xs md:text-sm font-medium leading-relaxed whitespace-pre-line">
+                {customConfirm.message}
+              </div>
+            </div>
+            <div className="bg-slate-50 px-6 py-4 flex justify-end gap-2.5 border-t border-slate-100">
+              <button
+                onClick={() => setCustomConfirm(prev => ({ ...prev, isOpen: false }))}
+                className="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 text-xs font-bold rounded-lg transition-colors cursor-pointer"
+              >
+                {customConfirm.cancelText || '취소'}
+              </button>
+              <button
+                onClick={customConfirm.onConfirm}
+                className="px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white text-xs font-bold rounded-lg shadow-sm shadow-orange-500/10 transition-colors cursor-pointer"
+              >
+                {customConfirm.confirmText || '확인'}
+              </button>
+            </div>
           </div>
         </div>
       )}

@@ -6,7 +6,11 @@
 import React from 'react';
 import { ShieldCheck, FlameKindling, Building } from 'lucide-react';
 
-export default function Footer() {
+interface FooterProps {
+  onResetCache?: () => void;
+}
+
+export default function Footer({ onResetCache }: FooterProps) {
   return (
     <footer className="bg-slate-900 text-slate-400 border-t border-slate-950 text-2xs md:text-xs" id="footer-details">
       
@@ -51,7 +55,9 @@ export default function Footer() {
             </p>
             <button 
               onClick={() => {
-                if (window.confirm("기존 브라우저 로컬 캐시(로컬스토리지)에 저장되었던 이미지와 커스텀 수정 데이터를 최신 고화질 정밀 사진과 제품 목록으로 전부 원천 초기화(Reset)하여 복구하시겠습니까?\n\n이 작업은 깨진 이미지 엑박 현상을 즉시 정형화 해결하고 화면을 리프레시합니다.")) {
+                if (onResetCache) {
+                  onResetCache();
+                } else if (window.confirm("기존 브라우저 로컬 캐시(로컬스토리지)에 저장되었던 이미지와 커스텀 수정 데이터를 최신 고화질 정밀 사진과 제품 목록으로 전부 원천 초기화(Reset)하여 복구하시겠습니까?\n\n이 작업은 깨진 이미지 엑박 현상을 즉시 정형화 해결하고 화면을 리프레시합니다.")) {
                   localStorage.clear();
                   window.location.reload();
                 }
