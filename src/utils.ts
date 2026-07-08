@@ -19,7 +19,7 @@ import unMixedAgitation from './assets/images/un_mixed_agitation_1783488076632.j
 import un120WhiteTank from './assets/images/un120_white_tank_1783489320557.jpg';
 
 /**
- * Resolves static paths to compiled Vite bundled assets
+ * Resolves static paths to compiled Vite bundled assets or direct public folder paths
  */
 export const resolveAssetPath = (pathStr: string): string => {
   if (!pathStr) return '';
@@ -27,7 +27,10 @@ export const resolveAssetPath = (pathStr: string): string => {
   let filename = pathStr.substring(pathStr.lastIndexOf('/') + 1);
   // Strip any Vite build hash (e.g. -D8iTWLki before extension)
   filename = filename.replace(/-[a-zA-Z0-9_]{8}\./, '.');
-  switch (filename) {
+  
+  const lowerName = filename.toLowerCase();
+  
+  switch (lowerName) {
     case 'regenerated_image_1781685239299.png': return regImage1;
     case 'regenerated_image_1781685912943.png': return regImage2;
     case 'regenerated_image_1781685907524.png': return regImage3;
@@ -50,6 +53,8 @@ export const resolveAssetPath = (pathStr: string): string => {
     case 'un_standard_tank_1783488042149.jpg': return unStandardTank;
     case 'kid_dosing_tank_1783488058945.jpg': return kidDosingTank;
     case 'un_mixed_agitation_1783488076632.jpg': return unMixedAgitation;
-    default: return pathStr;
+    default: 
+      // Safe fallback to static public folder serving which handles .JPG / .PNG and user-uploaded custom files directly
+      return `/assets/images/${filename}`;
   }
 };
