@@ -24,7 +24,9 @@ import un120WhiteTank from './assets/images/un120_white_tank_1783489320557.jpg';
 export const resolveAssetPath = (pathStr: string): string => {
   if (!pathStr) return '';
   // Extract only the filename from the path to guarantee matching regardless of /src/ or arbitrary prefixes
-  const filename = pathStr.substring(pathStr.lastIndexOf('/') + 1);
+  let filename = pathStr.substring(pathStr.lastIndexOf('/') + 1);
+  // Strip any Vite build hash (e.g. -D8iTWLki before extension)
+  filename = filename.replace(/-[a-zA-Z0-9_]{8}\./, '.');
   switch (filename) {
     case 'regenerated_image_1781685239299.png': return regImage1;
     case 'regenerated_image_1781685912943.png': return regImage2;

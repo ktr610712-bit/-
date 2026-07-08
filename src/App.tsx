@@ -210,23 +210,43 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    localStorage.setItem('UW_PRODUCTS_V2', JSON.stringify(products));
+    try {
+      localStorage.setItem('UW_PRODUCTS_V2', JSON.stringify(products));
+    } catch (e) {
+      console.warn('Local storage write limit or access denied:', e);
+    }
   }, [products]);
 
   useEffect(() => {
-    localStorage.setItem('UW_INQUIRIES', JSON.stringify(inquiries));
+    try {
+      localStorage.setItem('UW_INQUIRIES', JSON.stringify(inquiries));
+    } catch (e) {
+      console.warn('Local storage write limit or access denied:', e);
+    }
   }, [inquiries]);
 
   useEffect(() => {
-    localStorage.setItem('UW_IS_ADMIN', String(isAdmin));
+    try {
+      localStorage.setItem('UW_IS_ADMIN', String(isAdmin));
+    } catch (e) {
+      console.warn('Local storage write limit or access denied:', e);
+    }
   }, [isAdmin]);
 
   useEffect(() => {
-    localStorage.setItem('UW_HERO_BADGE', heroBadgeText);
+    try {
+      localStorage.setItem('UW_HERO_BADGE', heroBadgeText);
+    } catch (e) {
+      console.warn('Local storage write limit or access denied:', e);
+    }
   }, [heroBadgeText]);
 
   useEffect(() => {
-    localStorage.setItem('UW_HERO_IMAGE', heroImageUrl);
+    try {
+      localStorage.setItem('UW_HERO_IMAGE', heroImageUrl);
+    } catch (e) {
+      console.warn('Local storage write limit or access denied:', e);
+    }
   }, [heroImageUrl]);
 
   // Admin login trigger handler
@@ -401,29 +421,63 @@ export default function App() {
     setShowImageEditModal(true);
   };
 
+  // Helper to compress and resize large uploaded images (prevents localStorage QuotaExceededError)
+  const compressAndResizeImage = (file: File, callback: (base64: string) => void) => {
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        let width = img.width;
+        let height = img.height;
+
+        // Scale down to max 1024px width or height
+        const MAX_WIDTH = 1024;
+        const MAX_HEIGHT = 1024;
+        if (width > height) {
+          if (width > MAX_WIDTH) {
+            height *= MAX_WIDTH / width;
+            width = MAX_WIDTH;
+          }
+        } else {
+          if (height > MAX_HEIGHT) {
+            width *= MAX_HEIGHT / height;
+            height = MAX_HEIGHT;
+          }
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+          ctx.drawImage(img, 0, 0, width, height);
+          // Compress quality to 0.75 as JPEG to keep size minimal (~100KB)
+          const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.75);
+          callback(compressedDataUrl);
+        } else {
+          callback(event.target?.result as string);
+        }
+      };
+      img.src = event.target?.result as string;
+    };
+    reader.readAsDataURL(file);
+  };
+
   const handleHeroImageFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        if (typeof reader.result === 'string') {
-          setImageEditTemp(reader.result);
-        }
-      };
-      reader.readAsDataURL(file);
+      compressAndResizeImage(file, (compressedBase64) => {
+        setImageEditTemp(compressedBase64);
+      });
     }
   };
 
   const handleProductImageFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        if (typeof reader.result === 'string') {
-          setFormImage(reader.result);
-        }
-      };
-      reader.readAsDataURL(file);
+      compressAndResizeImage(file, (compressedBase64) => {
+        setFormImage(compressedBase64);
+      });
     }
   };
 
