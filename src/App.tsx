@@ -950,7 +950,7 @@ export default function App() {
                 {imageEditTemp && (
                   <div className="border border-slate-100 rounded-lg p-2 bg-slate-50 flex items-center gap-3">
                     <div className="w-12 h-12 rounded overflow-hidden bg-white border border-slate-200 shrink-0">
-                      <img src={imageEditTemp} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                      <img src={resolveAssetPath(imageEditTemp)} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
                     </div>
                     <div className="flex-1 min-w-0">
                       <span className="text-[10px] font-extrabold text-slate-500 block uppercase">미리보기</span>
