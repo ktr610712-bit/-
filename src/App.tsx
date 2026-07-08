@@ -23,7 +23,7 @@ import ProductSpecsList from './components/ProductSpecsList';
 import ConsultationForm from './components/ConsultationForm';
 import Footer from './components/Footer';
 
-import { ChevronLeft, ChevronRight, Plus, X, Lock, ShieldCheck, Edit, Trash2, BookOpen, AlertTriangle, Eye, CheckCircle2, XCircle, Info, Settings, RefreshCw } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Plus, X, Lock, ShieldCheck, Edit, Trash2, BookOpen, AlertTriangle, Eye, CheckCircle2, XCircle, Info, Settings, RefreshCw, Upload } from 'lucide-react';
 
 export default function App() {
   // Navigation & Page Tabs
@@ -59,16 +59,30 @@ export default function App() {
       '/assets/images/regenerated_image_1781685907524.png',
       '/assets/images/regenerated_image_1781688139818.png',
       '/assets/images/regenerated_image_1781688142077.png',
+      '/assets/images/uploaded_tank_1_1781683205180.jpg',
+      '/assets/images/un120_white_tank_1783489320557.jpg',
+      '/assets/images/uploaded_tank_2_1781683222315.jpg',
+      '/assets/images/uploaded_tank_3_1781683237138.jpg',
+      '/assets/images/uploaded_tank_4_1781683252954.jpg',
       '/assets/images/uploaded_tank_5_1781683266079.jpg',
       '/assets/images/uploaded_tank_6_1781683278949.jpg',
-      '/assets/images/uploaded_tank_8_1781683306440.jpg'
+      '/assets/images/uploaded_tank_7_1781683291987.jpg',
+      '/assets/images/uploaded_tank_8_1781683306440.jpg',
+      '/assets/images/un_standard_tank_1783488042149.jpg',
+      '/assets/images/kid_dosing_tank_1783488058945.jpg',
+      '/assets/images/un_mixed_agitation_1783488076632.jpg'
     ]);
+
+    if (saved && (saved.includes('uploaded_tank_1_1781683205180.jpg') || saved.includes('uploaded_tank_5_1781683266079.jpg'))) {
+      localStorage.setItem('UW_HERO_IMAGE', '/assets/images/un120_white_tank_1783489320557.jpg');
+      return '/assets/images/un120_white_tank_1783489320557.jpg';
+    }
 
     if (saved && validHeroSet.has(saved)) {
       return saved;
     }
-    // 캐시가 깨져있거나, 구버전 주소이거나, 경로가 올바르지 않으면 메인 오렌지 철재보강 정밀 사진(1번)으로 실시간 동기 복구합니다.
-    return '/assets/images/regenerated_image_1781685239299.png';
+    // 캐시가 깨져있거나, 구버전 주소이거나, 경로가 올바르지 않으면 1번 원본 UN120 백색원형 사진으로 실시간 동기 복구합니다.
+    return '/assets/images/un120_white_tank_1783489320557.jpg';
   });
   const [showImageEditModal, setShowImageEditModal] = useState<boolean>(false);
   const [imageEditTemp, setImageEditTemp] = useState<string>('');
@@ -101,11 +115,16 @@ export default function App() {
               categoryName = 'UD 완전배출 탱크';
             }
 
+            let image = edited.image || dp.image;
+            if (dp.id === 'un-standard-tank' && (!image || image.includes('uploaded_tank_5_1781683266079.jpg') || image.includes('uploaded_tank_1_1781683205180.jpg'))) {
+              image = '/assets/images/un120_white_tank_1783489320557.jpg';
+            }
+
             return {
               ...dp,
               ...edited,
               id: dp.id,
-              image: dp.image, // 기본 탑재 고정 정밀 기획 이미지를 100% 무결 보존
+              image,
               categoryName,
             };
           }
@@ -382,9 +401,35 @@ export default function App() {
     setShowImageEditModal(true);
   };
 
+  const handleHeroImageFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        if (typeof reader.result === 'string') {
+          setImageEditTemp(reader.result);
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleProductImageFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        if (typeof reader.result === 'string') {
+          setFormImage(reader.result);
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   const handleImageEditSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setHeroImageUrl(imageEditTemp.trim() || '/assets/images/uploaded_tank_1_1781683205180.jpg');
+    setHeroImageUrl(imageEditTemp.trim() || '/assets/images/un120_white_tank_1783489320557.jpg');
     setShowImageEditModal(false);
   };
 
@@ -488,8 +533,34 @@ export default function App() {
               <div className="space-y-8 animate-in fade-in duration-300">
 
                 {/* 🔧 간편 이미지 및 카탈로그 이지 에디터 (Easy Editor console) */}
-                {isAdmin && (
-                  <div className="bg-slate-900/60 rounded-2xl p-5 border border-slate-800 space-y-4 mb-6 shadow-xl backdrop-blur-sm" id="easy-editor-console">
+                {!isAdmin ? (
+                  <div className="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm mb-6 animate-in fade-in duration-350" id="easy-editor-console-trigger">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                      <div className="flex items-start gap-3.5">
+                        <div className="p-3 bg-orange-50 text-orange-500 rounded-xl shrink-0 mt-0.5">
+                          <Settings className="w-5 h-5 animate-spin" style={{ animationDuration: '8s' }} />
+                        </div>
+                        <div>
+                          <h3 className="font-extrabold text-sm text-slate-800 flex items-center gap-2">
+                            <span>울트라월드 실시간 간편 편집 모드 (OFF)</span>
+                            <span className="inline-block w-2 h-2 rounded-full bg-slate-300"></span>
+                          </h3>
+                          <p className="text-slate-500 text-[11px] leading-relaxed mt-1">
+                            현재 일반 모드입니다. 우측의 [편집 모드 활성화] 버튼을 켜시면 복잡한 로그인 과정 없이<br className="hidden md:block" />
+                            <strong>각 제품 카드의 [수정] 버튼</strong>이 생겨나 6, 7, 8번을 포함한 모든 사진과 사양 규격을 직접 실시간으로 교체하실 수 있습니다!
+                          </p>
+                        </div>
+                      </div>
+                      <button
+                        onClick={() => setIsAdmin(true)}
+                        className="bg-orange-500 hover:bg-orange-600 text-white font-extrabold text-xs px-5 py-3 rounded-xl cursor-pointer shadow-md shadow-orange-500/10 transition-all whitespace-nowrap self-end sm:self-center"
+                      >
+                        편집 모드 활성화 (ON)
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="bg-slate-900/60 rounded-2xl p-5 border border-slate-800 space-y-4 mb-6 shadow-xl backdrop-blur-sm animate-in fade-in duration-350" id="easy-editor-console">
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-800/80">
                     <div className="flex items-center gap-2.5">
                       <div className="p-2 bg-orange-500/10 text-orange-400 rounded-lg shrink-0">
@@ -520,61 +591,56 @@ export default function App() {
                     </button>
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-1">
+                  <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 pt-1">
                     {/* 1. 간편 로그인 토글 */}
-                    <div className="bg-slate-950/40 p-4 rounded-xl border border-slate-800/60 flex flex-col justify-between space-y-3">
+                    <div className="lg:col-span-4 bg-slate-950/40 p-4 rounded-xl border border-slate-800/60 flex flex-col justify-between space-y-3">
                       <div className="flex items-center justify-between gap-4">
                         <div>
-                          <span className="text-[11px] font-extrabold text-orange-400 block uppercase tracking-wider">01. 쉬운 수정을 위한 편집 모드 스위치</span>
-                          <span className="text-slate-400 text-3xs font-medium leading-normal block">복잡한 비밀번호 입력 없이 토글 클릭 한 번으로 모든 버튼을 활성화합니다.</span>
+                          <span className="text-[11px] font-extrabold text-orange-400 block uppercase tracking-wider">01. 편집 모드 마스터 스위치</span>
+                          <span className="text-slate-400 text-[10px] font-medium leading-normal block">클릭 한 번으로 모든 편집 버튼을 켜고 끌 수 있습니다.</span>
                         </div>
                         <button
-                          onClick={() => setIsAdmin(!isAdmin)}
-                          className={`px-3 py-2 rounded-xl text-xs font-extrabold transition-all cursor-pointer whitespace-nowrap shrink-0 ${
-                            isAdmin 
-                              ? 'bg-orange-500 text-white shadow-md shadow-orange-500/20' 
-                              : 'bg-slate-800 text-slate-400 hover:bg-slate-750 hover:text-slate-200'
-                          }`}
+                          onClick={() => setIsAdmin(false)}
+                          className="px-3 py-2 rounded-xl text-xs font-extrabold bg-orange-500 text-white shadow-md shadow-orange-500/20 transition-all cursor-pointer whitespace-nowrap shrink-0 hover:bg-orange-650"
                         >
-                          {isAdmin ? 'ON (편집 모드)' : 'OFF (일반 모드)'}
+                          ON (편집 끄기)
                         </button>
                       </div>
 
-                      {isAdmin ? (
-                        <div className="bg-green-500/10 text-green-400 border border-green-500/20 p-2.5 rounded-lg text-3xs font-medium space-y-1">
-                          <p className="flex items-center gap-1 font-bold">
-                            <span className="w-1.5 h-1.5 bg-green-405 rounded-full shrink-0 animate-ping"></span>
-                            <span>수정 권한 활성화 완료! 아래의 수정법을 확인해보세요:</span>
-                          </p>
-                          <ul className="list-disc pl-3.5 space-y-0.5 text-slate-300">
-                            <li>하단 각 제품 카드 우상단의 <strong className="text-white">[수정]</strong> 버튼으로 상세 규격을 실시간 수정</li>
-                            <li>하단 제품 목록 우측 상단의 <strong className="text-white">[새 제품 추가]</strong> 버튼으로 신규 탱크 추가</li>
-                            <li>상단 히어로 배너 우측 하단의 <strong className="text-white">[대표 사진 수정]</strong> 카메라 아이콘 클릭 후 사진 교체</li>
-                          </ul>
-                        </div>
-                      ) : (
-                        <div className="bg-slate-900/50 text-slate-500 p-2.5 rounded-lg text-3xs font-medium leading-relaxed">
-                          스위치를 ON으로 켜시면 복잡한 로그인 과정 없이 웹페이지 내용물들을 직접 고치는 버튼들이 즉각 활성화됩니다.
-                        </div>
-                      )}
+                      <div className="bg-green-500/10 text-green-400 border border-green-500/20 p-2.5 rounded-lg text-3xs font-medium space-y-1">
+                        <p className="flex items-center gap-1 font-bold">
+                          <span className="w-1.5 h-1.5 bg-green-450 rounded-full shrink-0 animate-ping"></span>
+                          <span>수정 권한 활성화 중:</span>
+                        </p>
+                        <ul className="list-disc pl-3.5 space-y-0.5 text-slate-300">
+                          <li>하단 제품 카드 우상단의 <strong className="text-white font-bold">[수정]</strong> 버튼으로 각 제품 이미지/규격을 마음대로 편집</li>
+                          <li>하단 제품 목록 우측 상단의 <strong className="text-white font-bold">[새 약품탱크 추가]</strong> 클릭으로 신제품 등록</li>
+                          <li>상단 히어로 배너 우측 하단의 카메라 아이콘 클릭 후 배너 교체</li>
+                        </ul>
+                      </div>
                     </div>
 
-                     <div className="bg-slate-950/40 p-4 rounded-xl border border-slate-800/60 space-y-2.5 flex flex-col justify-between">
+                     <div className="lg:col-span-8 bg-slate-950/40 p-4 rounded-xl border border-slate-800/60 space-y-2.5 flex flex-col justify-between">
                        <div>
-                         <span className="text-[11px] font-extrabold text-orange-400 block uppercase tracking-wider">02. 업로드 실물 탱크 사진 8종 원클릭 즉시 가설 연동</span>
-                         <span className="text-slate-400 text-3xs font-medium block leading-normal">아래 버튼을 누르면 상단 메인을 귀하가 올린 8개의 무수정 실물 원본 탱크 고화질 사진 중 하나로 즉시 전환 연동시킵니다.</span>
+                         <span className="text-[11px] font-extrabold text-orange-400 block uppercase tracking-wider">02. 실물 고화질 원본 & AI 재생성 사진 (총 13종 프리셋) 메인 배너 연결</span>
+                         <span className="text-slate-400 text-3xs font-medium block leading-normal">아래 버튼을 누르면 메인 탑 배너의 대표 사진을 귀하가 지정한 사진으로 즉각 교환 연동시킵니다.</span>
                        </div>
  
-                       <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 mt-2">
+                       <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-1.5 mt-1 max-h-40 overflow-y-auto pr-1">
                          {[
-                           { label: '01. UG 오렌지 철재거치', url: '/assets/images/regenerated_image_1781685239299.png' },
-                           { label: '02. 사각 도징용 백색', url: '/assets/images/uploaded_tank_6_1781683278949.jpg' },
-                           { label: '03. 안전 가드데크 사다리', url: '/assets/images/regenerated_image_1781685912943.png' },
-                           { label: '04. 공장 거치형 주황보강', url: '/assets/images/regenerated_image_1781685907524.png' },
-                           { label: '05. 소형 백색 주입용', url: '/assets/images/uploaded_tank_2_1781683222315.jpg' },
-                           { label: '06. UN120 눈금 백색원형', url: '/assets/images/uploaded_tank_5_1781683266079.jpg' },
-                           { label: '07. 광택 STS 보강 밴드', url: '/assets/images/uploaded_tank_7_1781683291987.jpg' },
-                           { label: '08. 야외 주황 가드 사다리', url: '/assets/images/uploaded_tank_8_1781683306440.jpg' },
+                           { label: '01. 원본: UN120 백색원형', url: '/assets/images/un120_white_tank_1783489320557.jpg' },
+                           { label: '02. 원본: 소형 백색 200L', url: '/assets/images/uploaded_tank_2_1781683222315.jpg' },
+                           { label: '03. 원본: 가드데크 사다리 10톤', url: '/assets/images/uploaded_tank_3_1781683237138.jpg' },
+                           { label: '04. 원본: 공장 주황보강 15톤', url: '/assets/images/uploaded_tank_4_1781683252954.jpg' },
+                           { label: '05. 원본: UN120 눈금 원형', url: '/assets/images/uploaded_tank_5_1781683266079.jpg' },
+                           { label: '06. 원본: 사각 도징용 백색탱크', url: '/assets/images/uploaded_tank_6_1781683278949.jpg' },
+                           { label: '07. 원본: 광택 STS 보강 밴드', url: '/assets/images/uploaded_tank_7_1781683291987.jpg' },
+                           { label: '08. 원본: 야외 주황 가드 사다리', url: '/assets/images/uploaded_tank_8_1781683306440.jpg' },
+                           { label: '★ AI: UG 오렌지 철재거치', url: '/assets/images/regenerated_image_1781685239299.png' },
+                           { label: '★ AI: 안전 가드데크 사다리', url: '/assets/images/regenerated_image_1781685912943.png' },
+                           { label: '★ AI: 공장 거치형 주황보강', url: '/assets/images/regenerated_image_1781685907524.png' },
+                           { label: '★ AI: UN형 교반탱크', url: '/assets/images/regenerated_image_1781688139818.png' },
+                           { label: '★ AI: STS보강 고화질 탱크', url: '/assets/images/regenerated_image_1781688142077.png' },
                          ].map((preset, index) => {
                            const isCurrent = heroImageUrl === preset.url;
                            return (
@@ -584,7 +650,7 @@ export default function App() {
                                  setHeroImageUrl(preset.url);
                                  setImageEditTemp(preset.url);
                                }}
-                               className={`p-2 rounded-lg text-[10px] font-semibold text-left transition-all border shrink-0 flex items-center justify-between cursor-pointer ${
+                               className={`p-1.5 rounded-lg text-[10px] font-semibold text-left transition-all border shrink-0 flex items-center justify-between cursor-pointer ${
                                  isCurrent 
                                    ? 'border-orange-500 bg-orange-500/10 text-orange-400 font-extrabold' 
                                    : 'border-slate-850 bg-slate-900 hover:border-slate-700 text-slate-400'
@@ -865,16 +931,45 @@ export default function App() {
             </div>
 
             <form onSubmit={handleImageEditSubmit} className="space-y-4">
-              <div className="space-y-1">
-                <label className="text-[11px] font-bold text-slate-600 block">이미지 파일/웹 주소 (URL)</label>
-                <input 
-                  type="text" 
-                  value={imageEditTemp}
-                  onChange={(e) => setImageEditTemp(e.target.value)}
-                  className="w-full text-xs px-3.5 py-2.5 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 font-medium font-mono"
-                  placeholder="이미지 URL을 직접 입력"
-                  required
-                />
+              <div className="space-y-3">
+                <div className="space-y-1">
+                  <label className="text-[11px] font-bold text-slate-600 block">내 컴퓨터에서 이미지 직접 업로드</label>
+                  <label className="flex flex-col items-center justify-center border-2 border-dashed border-slate-200 hover:border-orange-500 rounded-xl p-4 cursor-pointer transition-all bg-slate-50 hover:bg-orange-50/20 group">
+                    <Upload className="w-8 h-8 text-slate-400 group-hover:text-orange-500 mb-1.5" />
+                    <span className="text-2xs font-extrabold text-slate-700 group-hover:text-orange-600">이곳을 클릭하여 사진 파일 선택</span>
+                    <span className="text-3xs text-slate-400 mt-0.5">PNG, JPG, JPEG, GIF 등 이미지 파일 지원</span>
+                    <input 
+                      type="file" 
+                      accept="image/*" 
+                      onChange={handleHeroImageFileChange} 
+                      className="hidden" 
+                    />
+                  </label>
+                </div>
+
+                {imageEditTemp && (
+                  <div className="border border-slate-100 rounded-lg p-2 bg-slate-50 flex items-center gap-3">
+                    <div className="w-12 h-12 rounded overflow-hidden bg-white border border-slate-200 shrink-0">
+                      <img src={imageEditTemp} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <span className="text-[10px] font-extrabold text-slate-500 block uppercase">미리보기</span>
+                      <span className="text-[9px] text-slate-400 block truncate">{imageEditTemp.startsWith('data:') ? '직접 업로드된 파일 이미지' : imageEditTemp}</span>
+                    </div>
+                  </div>
+                )}
+
+                <div className="space-y-1">
+                  <label className="text-[11px] font-bold text-slate-600 block">또는 이미지 주소 링크(URL)</label>
+                  <input 
+                    type="text" 
+                    value={imageEditTemp}
+                    onChange={(e) => setImageEditTemp(e.target.value)}
+                    className="w-full text-xs px-3.5 py-2.5 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 font-medium font-mono"
+                    placeholder="이미지 URL을 직접 입력"
+                    required
+                  />
+                </div>
               </div>
 
               {/* Quick presets for easier admin choice */}
@@ -977,51 +1072,83 @@ export default function App() {
               </div>
 
               {/* Dynamic Image Preset Selector Helper */}
-              <div className="space-y-2.5 p-3 bg-slate-50 rounded-xl border border-slate-200">
+              <div className="space-y-2 p-3 bg-slate-50 rounded-xl border border-slate-200">
                 <span className="text-[11.5px] font-bold text-slate-700 flex items-center gap-1.5">
-                  <span className="text-orange-500 font-extrabold">📸</span> 원클릭 장비 이미지 프리셋 선택 (매우 권장)
+                  <span className="text-orange-500 font-extrabold">📸</span> 원클릭 장비 이미지 프리셋 선택 (총 13종 완벽 지원)
                 </span>
-                <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-1.5">
+                <div className="grid grid-cols-3 sm:grid-cols-5 md:grid-cols-7 lg:grid-cols-9 xl:grid-cols-13 gap-1 max-h-44 overflow-y-auto p-1 bg-white rounded-lg border border-slate-100">
                   {[
-                    { label: '01. UG 주황 철재거치', img: '/assets/images/regenerated_image_1781685239299.png' },
-                    { label: '02. 안전 가드데크 사다리', img: '/assets/images/regenerated_image_1781685912943.png' },
-                    { label: '03. 공장 거치형 주황보강', img: '/assets/images/regenerated_image_1781685907524.png' },
-                    { label: '04. UN형 고화질 교반탱크', img: '/assets/images/regenerated_image_1781688139818.png' },
-                    { label: '05. STS보강 고화질 탱크', img: '/assets/images/regenerated_image_1781688142077.png' },
-                    { label: '06. UN120 눈금 백색원형', img: '/assets/images/uploaded_tank_5_1781683266079.jpg' },
-                    { label: '07. 사각 도징용 백색탱크', img: '/assets/images/uploaded_tank_6_1781683278949.jpg' },
-                    { label: '08. 야외 주황 가드 사다리', img: '/assets/images/uploaded_tank_8_1781683306440.jpg' },
+                    { label: '01. UN120 백색원형', img: '/assets/images/un120_white_tank_1783489320557.jpg' },
+                    { label: '02. 소형 백색 200L', img: '/assets/images/uploaded_tank_2_1781683222315.jpg' },
+                    { label: '03. 가드데크 10톤', img: '/assets/images/uploaded_tank_3_1781683237138.jpg' },
+                    { label: '04. 공장 주황 15톤', img: '/assets/images/uploaded_tank_4_1781683252954.jpg' },
+                    { label: '05. UN120 눈금원형', img: '/assets/images/uploaded_tank_5_1781683266079.jpg' },
+                    { label: '06. 사각 도징용 백색', img: '/assets/images/uploaded_tank_6_1781683278949.jpg' },
+                    { label: '07. 광택 STS 보강', img: '/assets/images/uploaded_tank_7_1781683291987.jpg' },
+                    { label: '08. 야외 주황 사다리', img: '/assets/images/uploaded_tank_8_1781683306440.jpg' },
+                    { label: '★ UG 주황 (AI)', img: '/assets/images/regenerated_image_1781685239299.png' },
+                    { label: '★ 가드데크 (AI)', img: '/assets/images/regenerated_image_1781685912943.png' },
+                    { label: '★ 공장 보강 (AI)', img: '/assets/images/regenerated_image_1781685907524.png' },
+                    { label: '★ UN 교반형 (AI)', img: '/assets/images/regenerated_image_1781688139818.png' },
+                    { label: '★ STS 보강 (AI)', img: '/assets/images/regenerated_image_1781688142077.png' },
                   ].map((preset) => (
                     <button
                       key={preset.label}
                       type="button"
                       onClick={() => setFormImage(preset.img)}
-                      className={`text-[9px] font-bold rounded p-1 border text-center transition-all cursor-pointer ${
+                      className={`text-[8px] font-bold rounded p-1 border text-center transition-all cursor-pointer ${
                         formImage === preset.img 
                           ? 'border-orange-500 bg-orange-50 text-orange-700 font-extrabold' 
-                          : 'border-slate-200 bg-white hover:bg-slate-100 text-slate-600'
+                          : 'border-slate-100 bg-white hover:bg-slate-50 text-slate-500'
                       }`}
                     >
-                      <div className="w-full h-8 bg-slate-150 rounded overflow-hidden mb-1 pointer-events-none">
-                        <img src={resolveAssetPath(preset.img)} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                      <div className="w-full h-7 bg-slate-100 rounded overflow-hidden mb-1 pointer-events-none">
+                        <img src={resolveAssetPath(preset.img)} className="w-full h-full object-cover animate-fade-in" referrerPolicy="no-referrer" />
                       </div>
-                      <span className="block truncate text-[8px] leading-tight font-medium">{preset.label}</span>
+                      <span className="block truncate text-[7.5px] leading-none font-medium">{preset.label}</span>
                     </button>
                   ))}
                 </div>
                 
-                {/* Manual Image URL field */}
-                <div className="space-y-1 pt-1.5">
-                  <label className="text-[10px] font-bold text-slate-500 block">또는 개별 이미지 주소 링크(URL) 직접 입력</label>
-                  <input 
-                    type="text" 
-                    value={formImage}
-                    onChange={(e) => setFormImage(e.target.value)}
-                    placeholder="https://..."
-                    className="w-full text-3xs px-3 py-1.5 border border-slate-200 rounded bg-white focus:outline-none"
-                    required
-                  />
+                {/* Genuine File Upload or Manual Link */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2">
+                  <div className="space-y-1">
+                    <label className="text-[10px] font-bold text-slate-500 block">내 컴퓨터에서 이미지 직접 업로드</label>
+                    <label className="flex flex-col items-center justify-center border border-dashed border-slate-200 hover:border-orange-500 rounded-lg p-2.5 cursor-pointer transition-all bg-white hover:bg-orange-50/10 group">
+                      <Upload className="w-5 h-5 text-slate-400 group-hover:text-orange-500 mb-1" />
+                      <span className="text-[9px] font-bold text-slate-600 group-hover:text-orange-600">사진 파일 선택</span>
+                      <input 
+                        type="file" 
+                        accept="image/*" 
+                        onChange={handleProductImageFileChange} 
+                        className="hidden" 
+                      />
+                    </label>
+                  </div>
+                  
+                  <div className="space-y-1">
+                    <label className="text-[10px] font-bold text-slate-500 block">또는 이미지 주소 링크(URL) 직접 입력</label>
+                    <textarea 
+                      value={formImage}
+                      onChange={(e) => setFormImage(e.target.value)}
+                      placeholder="https://... 또는 직접 업로드된 이미지 데이터"
+                      className="w-full h-[52px] text-[10px] p-2 border border-slate-200 rounded bg-white focus:outline-none resize-none font-mono"
+                      required
+                    />
+                  </div>
                 </div>
+
+                {formImage && (
+                  <div className="border border-slate-150 rounded-lg p-1.5 bg-white flex items-center gap-2">
+                    <div className="w-9 h-9 rounded overflow-hidden bg-slate-50 border border-slate-100 shrink-0">
+                      <img src={resolveAssetPath(formImage)} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <span className="text-[9px] font-bold text-slate-400 block uppercase leading-none mb-0.5">제품 사진 미리보기</span>
+                      <span className="text-[8px] text-slate-400 block truncate">{formImage.startsWith('data:') ? '사용자 직접 업로드 파일' : formImage}</span>
+                    </div>
+                  </div>
+                )}
               </div>
 
               <div className="grid grid-cols-2 gap-4">

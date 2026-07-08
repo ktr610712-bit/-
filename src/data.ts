@@ -10,7 +10,7 @@ import ugImg from './assets/images/regenerated_image_1781685239299.png';
 import unImg from './assets/images/regenerated_image_1781688139818.png';
 import deckImg from './assets/images/regenerated_image_1781685912943.png';
 import udImg from './assets/images/regenerated_image_1781685907524.png';
-import smallImg from './assets/images/uploaded_tank_5_1781683266079.jpg';
+import smallImg from './assets/images/un120_white_tank_1783489320557.jpg';
 import kidImg from './assets/images/uploaded_tank_6_1781683278949.jpg';
 import stsImg from './assets/images/regenerated_image_1781688142077.png';
 import deckLadderImg from './assets/images/uploaded_tank_8_1781683306440.jpg';
