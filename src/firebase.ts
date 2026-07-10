@@ -33,6 +33,23 @@ interface HeroSettings {
   badgeText: string;
 }
 
+function normalizeImageUrl(url: string, defaultFallback: string): string {
+  if (!url) return defaultFallback;
+  if (
+    url.includes('googleusercontent') ||
+    url.includes('google') ||
+    (url.startsWith('http') && 
+     !url.includes('ultratank.netlify.app') && 
+     !url.includes('ais-dev') && 
+     !url.includes('ais-pre') && 
+     !url.includes('localhost') &&
+     !url.includes('vercel.app'))
+  ) {
+    return defaultFallback;
+  }
+  return url;
+}
+
 export async function getHeroSettings(): Promise<HeroSettings> {
   try {
     const docRef = doc(db, 'settings', 'hero');
@@ -40,7 +57,7 @@ export async function getHeroSettings(): Promise<HeroSettings> {
     if (docSnap.exists()) {
       const data = docSnap.data();
       return {
-        imageUrl: data.imageUrl || '/assets/images/ug_orange_tank_1781680550681.jpg',
+        imageUrl: normalizeImageUrl(data.imageUrl, '/assets/images/ug_orange_tank_1781680550681.jpg'),
         badgeText: data.badgeText || 'PE 고강도 보강밴드형 케미칼탱크'
       };
     }
@@ -63,13 +80,27 @@ export async function saveHeroSettings(imageUrl: string, badgeText: string): Pro
 }
 
 // 2. Product Helpers
+const defaultProductImages: Record<string, string> = {
+  'ug-3000': '/assets/images/ug_orange_tank_1781680550681.jpg',
+  'un-mixer': '/assets/images/un_agitation_tank_1781680565572.jpg',
+  'sts-band-tank': '/assets/images/sts_band_tank_1781680585226.jpg',
+  'deck-type-tank': '/assets/images/deck_type_tank_1781680599823.jpg',
+  'ud-drainage-tank': '/assets/images/ud_drainage_tank_1781660890538.jpg',
+  'un-120-white-tank': '/assets/images/un120_white_tank_new_1783494600723.jpg',
+  'kid-dosing-tank': '/assets/images/kid_dosing_tank_1783488058945.jpg',
+  'un-mixed-agitation': '/assets/images/un_mixed_agitation_1783488076632.jpg',
+};
+
 export async function getProductsFromDb(): Promise<Product[]> {
   try {
     const querySnapshot = await getDocs(collection(db, 'products'));
     if (!querySnapshot.empty) {
       const productsList: Product[] = [];
       querySnapshot.forEach((doc) => {
-        productsList.push(doc.data() as Product);
+        const product = doc.data() as Product;
+        const fallback = defaultProductImages[product.id] || '/assets/images/ug_orange_tank_1781680550681.jpg';
+        product.image = normalizeImageUrl(product.image, fallback);
+        productsList.push(product);
       });
       return productsList;
     } else {
@@ -163,7 +194,11 @@ export async function getCustomPresetsFromDb(): Promise<CustomPreset[]> {
     const querySnapshot = await getDocs(collection(db, 'presets'));
     const presetsList: CustomPreset[] = [];
     querySnapshot.forEach((doc) => {
-      presetsList.push(doc.data() as CustomPreset);
+      const preset = doc.data() as CustomPreset;
+      // Filter out session-locked developer or Google user-content URLs
+      if (preset.url && !preset.url.includes('googleusercontent') && !preset.url.includes('google')) {
+        presetsList.push(preset);
+      }
     });
     return presetsList;
   } catch (err) {
