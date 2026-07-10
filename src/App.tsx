@@ -8,6 +8,19 @@ import { PRODUCT_DATA, INITIAL_INQUIRIES } from './data';
 import { Product, Category, Inquiry } from './types';
 import { resolveAssetPath } from './utils';
 import { 
+  getHeroSettings, 
+  saveHeroSettings, 
+  getProductsFromDb, 
+  saveProductToDb, 
+  deleteProductFromDb, 
+  getInquiriesFromDb, 
+  saveInquiryToDb, 
+  deleteInquiryFromDb, 
+  getCustomPresetsFromDb, 
+  saveCustomPresetToDb, 
+  deleteCustomPresetFromDb 
+} from './firebase';
+import { 
   CHEMICAL_RESISTANCE_DATA, 
   UN_KID_SPEC_DATA, 
   CAUTION_DATA 
@@ -203,6 +216,39 @@ export default function App() {
   // Track scrollable slider reference for featured products
   const sliderRef = useRef<HTMLDivElement>(null);
 
+  const [isDbLoading, setIsDbLoading] = useState<boolean>(true);
+
+  // Load cloud data from Firestore on mount
+  useEffect(() => {
+    async function loadCloudData() {
+      try {
+        setIsDbLoading(true);
+        
+        // 1. Hero settings
+        const hero = await getHeroSettings();
+        setHeroImageUrl(hero.imageUrl);
+        setHeroBadgeText(hero.badgeText);
+        
+        // 2. Products
+        const dbProducts = await getProductsFromDb();
+        setProducts(dbProducts);
+        
+        // 3. Inquiries
+        const dbInquiries = await getInquiriesFromDb();
+        setInquiries(dbInquiries);
+        
+        // 4. Custom presets
+        const dbPresets = await getCustomPresetsFromDb();
+        setCustomPresets(dbPresets);
+      } catch (err) {
+        console.error('Failed to load data from Firestore, using local fallback:', err);
+      } finally {
+        setIsDbLoading(false);
+      }
+    }
+    loadCloudData();
+  }, []);
+
   // Synchronize dynamic lists to storage
   useEffect(() => {
     try {
@@ -332,6 +378,7 @@ export default function App() {
   // Inquiry processing handlers
   const handleAddInquiry = (newInq: Inquiry) => {
     setInquiries((prev) => [newInq, ...prev]);
+    saveInquiryToDb(newInq);
   };
 
   const handleDeleteInquiry = (inquiryId: string) => {
@@ -340,13 +387,21 @@ export default function App() {
       '이 견적 상담 문의를 정말 삭제하시겠습니까?',
       () => {
         setInquiries((prev) => prev.filter((inq) => inq.id !== inquiryId));
+        deleteInquiryFromDb(inquiryId);
       }
     );
   };
 
   const handleUpdateInquiryStatus = (inquiryId: string, newStatus: '접수대기' | '검토중' | '답변완료') => {
     setInquiries((prev) =>
-      prev.map((inq) => (inq.id === inquiryId ? { ...inq, status: newStatus } : inq))
+      prev.map((inq) => {
+        if (inq.id === inquiryId) {
+          const updated = { ...inq, status: newStatus };
+          saveInquiryToDb(updated);
+          return updated;
+        }
+        return inq;
+      })
     );
   };
 
@@ -358,6 +413,7 @@ export default function App() {
       '정말로 이 제품을 카탈로그에서 삭제하시겠습니까? 관련 규격 스펙 목록에서도 모두 제거됩니다.',
       () => {
         setProducts((prev) => prev.filter((p) => p.id !== productId));
+        deleteProductFromDb(productId);
       }
     );
   };
@@ -410,32 +466,29 @@ export default function App() {
 
     if (editingProduct) {
       // Modify existing
+      const updatedProduct = {
+        ...editingProduct,
+        name: formName,
+        category: formCategory,
+        categoryName: categoryNames[formCategory],
+        image: formImage,
+        capacity: formCapacity,
+        dimensions: formDimensions,
+        features: parsedFeatures,
+        specs: {
+          ...editingProduct.specs,
+          model: formModel,
+          capacity: formCapacity,
+          diameter: formDimensions.split('x')[0]?.replace('Ø', '')?.trim() || editingProduct.specs.diameter,
+          height: formDimensions.split('x')[1]?.trim() || editingProduct.specs.height,
+          manhole: formManhole,
+          thickness: formThickness,
+        },
+      };
       setProducts((prev) =>
-        prev.map((p) => {
-          if (p.id === editingProduct.id) {
-            return {
-              ...p,
-              name: formName,
-              category: formCategory,
-              categoryName: categoryNames[formCategory],
-              image: formImage,
-              capacity: formCapacity,
-              dimensions: formDimensions,
-              features: parsedFeatures,
-              specs: {
-                ...p.specs,
-                model: formModel,
-                capacity: formCapacity,
-                diameter: formDimensions.split('x')[0]?.replace('Ø', '')?.trim() || p.specs.diameter,
-                height: formDimensions.split('x')[1]?.trim() || p.specs.height,
-                manhole: formManhole,
-                thickness: formThickness,
-              },
-            };
-          }
-          return p;
-        })
+        prev.map((p) => (p.id === editingProduct.id ? updatedProduct : p))
       );
+      saveProductToDb(updatedProduct);
     } else {
       // Add new
       const newId = `product-${Date.now()}`;
@@ -459,6 +512,7 @@ export default function App() {
         },
       };
       setProducts((prev) => [newProduct, ...prev]);
+      saveProductToDb(newProduct);
     }
 
     setShowProductFormModal(false);
@@ -472,7 +526,9 @@ export default function App() {
 
   const handleBadgeEditSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setHeroBadgeText(badgeEditTemp.trim() || 'PE 고강도 보강밴드형 케미칼탱크');
+    const newBadge = badgeEditTemp.trim() || 'PE 고강도 보강밴드형 케미칼탱크';
+    setHeroBadgeText(newBadge);
+    saveHeroSettings(heroImageUrl, newBadge);
     setShowBadgeEditModal(false);
   };
 
@@ -544,7 +600,9 @@ export default function App() {
 
   const handleImageEditSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setHeroImageUrl(imageEditTemp.trim() || '/assets/images/ug_orange_tank_1781680550681.jpg');
+    const newImg = imageEditTemp.trim() || '/assets/images/ug_orange_tank_1781680550681.jpg';
+    setHeroImageUrl(newImg);
+    saveHeroSettings(newImg, heroBadgeText);
     setShowImageEditModal(false);
   };
 
@@ -776,6 +834,7 @@ export default function App() {
                                           url: compressedBase64
                                         };
                                         setCustomPresets(prev => [...prev, newPreset]);
+                                        saveCustomPresetToDb(newPreset);
                                         if (inputElement) inputElement.value = '';
                                       });
                                     }
@@ -805,6 +864,7 @@ export default function App() {
                                     onClick={() => {
                                       setHeroImageUrl(preset.url);
                                       setImageEditTemp(preset.url);
+                                      saveHeroSettings(preset.url, heroBadgeText);
                                     }}
                                   >
                                     <span className="truncate flex-1 mr-1">{preset.label}</span>
@@ -818,6 +878,7 @@ export default function App() {
                                             `"${preset.label}" 프리셋을 삭제하시겠습니까?`,
                                             () => {
                                               setCustomPresets(prev => prev.filter(p => p.id !== preset.id));
+                                              deleteCustomPresetFromDb(preset.id);
                                             }
                                           );
                                         }}
@@ -1277,6 +1338,7 @@ export default function App() {
                               `"${preset.label}" 프리셋을 삭제하시겠습니까?`,
                               () => {
                                 setCustomPresets(prev => prev.filter(p => p.id !== preset.id));
+                                deleteCustomPresetFromDb(preset.id);
                               }
                             );
                           }}
@@ -1346,6 +1408,7 @@ export default function App() {
                             url: formImage
                           };
                           setCustomPresets(prev => [...prev, newPreset]);
+                          saveCustomPresetToDb(newPreset);
                         }}
                         className="px-2 py-1 bg-orange-100 hover:bg-orange-200 text-orange-700 text-[9px] font-extrabold rounded transition-all whitespace-nowrap cursor-pointer shrink-0"
                       >
