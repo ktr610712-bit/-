@@ -101,6 +101,9 @@ export default function App() {
     ]);
 
     if (saved) {
+      if (saved.startsWith('data:') || saved.startsWith('blob:')) {
+        return saved;
+      }
       // Extract only the filename and construct absolute path
       const lastSlash = saved.lastIndexOf('/');
       const filename = lastSlash !== -1 ? saved.substring(lastSlash + 1) : saved;
