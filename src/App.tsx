@@ -736,55 +736,18 @@ export default function App() {
                       </div>
                     </div>
 
-                      <div className="lg:col-span-8 bg-slate-950/40 p-4 rounded-xl border border-slate-800/60 space-y-2.5 flex flex-col justify-between">
+                      <div className="lg:col-span-8 bg-slate-950/40 p-4 rounded-xl border border-slate-800/60 space-y-3.5 flex flex-col justify-between">
                         <div>
-                          <span className="text-[11px] font-extrabold text-orange-400 block uppercase tracking-wider">02. 실물 고화질 원본 & AI 재생성 사진 (총 13종 프리셋) 메인 배너 연결</span>
-                          <span className="text-slate-400 text-3xs font-medium block leading-normal">아래 버튼을 누르면 메인 탑 배너의 대표 사진을 귀하가 지정한 사진으로 즉각 교환 연동시킵니다.</span>
+                          <span className="text-[11px] font-extrabold text-orange-400 block uppercase tracking-wider">02. 나만의 고화질 사진 프리셋 메인 배너 연결 ({customPresets.length}개 등록됨)</span>
+                          <span className="text-slate-400 text-3xs font-medium block leading-normal">아래 직접 등록한 프리셋을 선택하면 메인 탑 배너의 대표 사진을 귀하가 지정한 사진으로 즉각 교환 연동시킵니다.</span>
                         </div>
   
-                        <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-1.5 mt-1 max-h-40 overflow-y-auto pr-1">
-                          {[
-                            { label: '01. 원본: UN120 백색원형', url: '/assets/images/un120_white_tank_1783489320557.jpg' },
-                            { label: '02. 원본: 소형 백색 200L', url: '/assets/images/uploaded_tank_2_1781683222315.jpg' },
-                            { label: '03. 원본: 가드데크 사다리 10톤', url: '/assets/images/uploaded_tank_3_1781683237138.jpg' },
-                            { label: '04. 원본: 공장 주황보강 15톤', url: '/assets/images/uploaded_tank_4_1781683252954.jpg' },
-                            { label: '05. 원본: UN120 눈금 원형', url: '/assets/images/uploaded_tank_5_1781683266079.jpg' },
-                            { label: '06. 원본: 사각 도징용 백색탱크', url: '/assets/images/uploaded_tank_6_1781683278949.jpg' },
-                            { label: '07. 원본: 광택 STS 보강 밴드', url: '/assets/images/uploaded_tank_7_1781683291987.jpg' },
-                            { label: '08. 원본: 야외 주황 가드 사다리', url: '/assets/images/uploaded_tank_8_1781683306440.jpg' },
-                            { label: '★ AI: UG 오렌지 철재거치', url: '/assets/images/regenerated_image_1781685239299.png' },
-                            { label: '★ AI: 안전 가드데크 사다리', url: '/assets/images/regenerated_image_1781685912943.png' },
-                            { label: '★ AI: 공장 거치형 주황보강', url: '/assets/images/regenerated_image_1781685907524.png' },
-                            { label: '★ AI: UN형 교반탱크', url: '/assets/images/regenerated_image_1781688139818.png' },
-                            { label: '★ AI: STS보강 고화질 탱크', url: '/assets/images/regenerated_image_1781688142077.png' },
-                          ].map((preset, index) => {
-                            const isCurrent = heroImageUrl === preset.url;
-                            return (
-                              <button
-                                key={index}
-                                onClick={() => {
-                                  setHeroImageUrl(preset.url);
-                                  setImageEditTemp(preset.url);
-                                }}
-                                className={`p-1.5 rounded-lg text-[10px] font-semibold text-left transition-all border shrink-0 flex items-center justify-between cursor-pointer ${
-                                  isCurrent 
-                                    ? 'border-orange-500 bg-orange-500/10 text-orange-400 font-extrabold' 
-                                    : 'border-slate-850 bg-slate-900 hover:border-slate-700 text-slate-400'
-                                }`}
-                              >
-                                <span className="truncate">{preset.label}</span>
-                                {isCurrent && <span className="w-1.5 h-1.5 rounded-full bg-orange-400 shrink-0 ml-1"></span>}
-                              </button>
-                            );
-                          })}
-                        </div>
-
                         {/* 나만의 직접 업로드 프리셋 관리 기능 */}
-                        <div className="mt-3 pt-3 border-t border-slate-900/60 space-y-2">
-                          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                        <div className="space-y-3">
+                          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-900/60 pb-2">
                             <span className="text-[10px] font-extrabold text-slate-300 uppercase tracking-wider flex items-center gap-1">
                               <Upload className="w-3.5 h-3.5 text-orange-400" />
-                              나만의 직접 등록 프리셋 ({customPresets.length}개)
+                              신규 프리셋 직접 등록하기
                             </span>
                             <div className="flex items-center gap-1.5">
                               <input
@@ -821,9 +784,11 @@ export default function App() {
                           </div>
 
                           {customPresets.length === 0 ? (
-                            <p className="text-[9.5px] text-slate-500 italic">현재 직접 등록한 프리셋이 없습니다. 위 업로드 버튼으로 나만의 고화질 탱크 사진을 프리셋으로 등록해보세요!</p>
+                            <div className="py-6 text-center">
+                              <p className="text-[9.5px] text-slate-500 italic">현재 직접 등록한 프리셋이 없습니다. 위 업로드 버튼으로 나만의 고화질 탱크 사진을 프리셋으로 등록해보세요!</p>
+                            </div>
                           ) : (
-                            <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-1.5 max-h-32 overflow-y-auto pr-1">
+                            <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-1.5 max-h-40 overflow-y-auto pr-1">
                               {customPresets.map((preset) => {
                                 const isCurrent = heroImageUrl === preset.url;
                                 return (
@@ -1186,40 +1151,12 @@ export default function App() {
                 </div>
               </div>
 
-              {/* Quick presets for easier admin choice */}
-              <div className="space-y-2 mt-4">
-                <span className="text-[10px] font-extrabold text-slate-500 uppercase tracking-wider block">실물 고화질 탱크 사진 8종 선택</span>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-                  {[
-                    { label: '01. UG 오렌지 철재거치', url: './assets/images/ug_orange_tank_1781680550681.jpg' },
-                    { label: '02. 교반형 실내 정밀 보강', url: './assets/images/un_agitation_tank_1781680565572.jpg' },
-                    { label: '03. 광택 STS 보강 밴드', url: './assets/images/sts_band_tank_1781680585226.jpg' },
-                    { label: '04. 안전 가드데크 사다리', url: './assets/images/deck_type_tank_1781680599823.jpg' },
-                    { label: '05. 하부 배출 콘형 탱크', url: './assets/images/ud_drainage_tank_1781660890538.jpg' },
-                    { label: '06. UN120 눈금 백색원형', url: './assets/images/un120_white_tank_new_1783494600723.jpg' },
-                    { label: '07. 사각 KID형 백색도징', url: './assets/images/kid_dosing_tank_1783488058945.jpg' },
-                    { label: '08. 야외 주황 가드 사다리', url: './assets/images/un_mixed_agitation_1783488076632.jpg' },
-                  ].map((preset, index) => (
-                    <button
-                      key={index}
-                      type="button"
-                      onClick={() => setImageEditTemp(preset.url)}
-                      className={`p-2 border text-left rounded-lg text-3xs transition-all cursor-pointer ${
-                        imageEditTemp === preset.url 
-                          ? 'border-orange-500 bg-orange-50/50 text-orange-700 font-bold' 
-                          : 'border-slate-200 hover:border-slate-350 text-slate-600'
-                      }`}
-                    >
-                      {preset.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
               {/* Custom Presets inside modal */}
-              {customPresets.length > 0 && (
-                <div className="space-y-2 mt-4">
-                  <span className="text-[10px] font-extrabold text-slate-500 uppercase tracking-wider block">내가 직접 등록한 프리셋</span>
+              <div className="space-y-2 mt-4">
+                <span className="text-[10px] font-extrabold text-slate-500 uppercase tracking-wider block">내가 직접 등록한 프리셋</span>
+                {customPresets.length === 0 ? (
+                  <p className="text-[9.5px] text-slate-400 italic bg-slate-50 p-3 rounded-lg border border-slate-100">현재 직접 등록한 프리셋이 없습니다. 관리자용 대시보드의 프리셋 등록 기능을 통해 나만의 이미지를 프리셋으로 추가하실 수 있습니다.</p>
+                ) : (
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
                     {customPresets.map((preset) => (
                       <button
@@ -1237,8 +1174,8 @@ export default function App() {
                       </button>
                     ))}
                   </div>
-                </div>
-              )}
+                )}
+              </div>
 
               <div className="flex gap-2 justify-end pt-2">
                 <button 
@@ -1312,32 +1249,22 @@ export default function App() {
               {/* Dynamic Image Preset Selector Helper */}
               <div className="space-y-2 p-3 bg-slate-50 rounded-xl border border-slate-200">
                 <span className="text-[11.5px] font-bold text-slate-700 flex items-center gap-1.5">
-                  <span className="text-orange-500 font-extrabold">📸</span> 원클릭 장비 이미지 프리셋 선택 (총 {9 + customPresets.length}종 실물 고화질 완벽 지원)
+                  <span className="text-orange-500 font-extrabold">📸</span> 원클릭 장비 이미지 프리셋 선택 (총 {customPresets.length}종 직접 등록됨)
                 </span>
-                <div className="grid grid-cols-3 sm:grid-cols-5 md:grid-cols-7 lg:grid-cols-9 gap-1 max-h-44 overflow-y-auto p-1 bg-white rounded-lg border border-slate-100">
-                  {[
-                    { id: 'std_1', label: '01. UG 오렌지 철재거치', img: './assets/images/ug_orange_tank_1781680550681.jpg', isCustom: false },
-                    { id: 'std_2', label: '02. 교반형 실내 정밀 보강', img: './assets/images/un_agitation_tank_1781680565572.jpg', isCustom: false },
-                    { id: 'std_3', label: '03. 광택 STS 보강 밴드', img: './assets/images/sts_band_tank_1781680585226.jpg', isCustom: false },
-                    { id: 'std_4', label: '04. 안전 가드데크 사다리', img: './assets/images/deck_type_tank_1781680599823.jpg', isCustom: false },
-                    { id: 'std_5', label: '05. 하부 배출 콘형 탱크', img: './assets/images/ud_drainage_tank_1781660890538.jpg', isCustom: false },
-                    { id: 'std_6', label: '06. UN120 눈금 백색원형', img: './assets/images/un120_white_tank_new_1783494600723.jpg', isCustom: false },
-                    { id: 'std_7', label: '07. 사각 KID형 백색도징', img: './assets/images/kid_dosing_tank_1783488058945.jpg', isCustom: false },
-                    { id: 'std_8', label: '08. 야외 주황 가드 사다리', img: './assets/images/un_mixed_agitation_1783488076632.jpg', isCustom: false },
-                    { id: 'std_9', label: '09. 백색 거치대형 교반형', img: './assets/images/un_standard_tank_1783488042149.jpg', isCustom: false },
-                    ...customPresets.map((p) => ({ id: p.id, label: p.label, img: p.url, isCustom: true }))
-                  ].map((preset) => (
-                    <button
-                      key={preset.id}
-                      type="button"
-                      onClick={() => setFormImage(preset.img)}
-                      className={`relative text-[8px] font-bold rounded p-1 border text-center transition-all cursor-pointer ${
-                        formImage === preset.img 
-                          ? 'border-orange-500 bg-orange-50 text-orange-700 font-extrabold' 
-                          : 'border-slate-100 bg-white hover:bg-slate-50 text-slate-500'
-                      }`}
-                    >
-                      {preset.isCustom && (
+                {customPresets.length === 0 ? (
+                  <p className="text-[10px] text-slate-400 italic">현재 직접 등록한 프리셋이 없습니다. 아래 제품 사진 업로드 기능을 통해 이미지를 등록하시거나, 이미지를 업로드한 뒤 [이 이미지를 프리셋으로 저장] 버튼을 눌러 등록해주세요.</p>
+                ) : (
+                  <div className="grid grid-cols-3 sm:grid-cols-5 md:grid-cols-7 lg:grid-cols-9 gap-1 max-h-44 overflow-y-auto p-1 bg-white rounded-lg border border-slate-100">
+                    {customPresets.map((preset) => (
+                      <div
+                        key={preset.id}
+                        onClick={() => setFormImage(preset.url)}
+                        className={`relative text-[8px] font-bold rounded p-1 border text-center transition-all cursor-pointer ${
+                          formImage === preset.url 
+                            ? 'border-orange-500 bg-orange-50 text-orange-700 font-extrabold' 
+                            : 'border-slate-100 bg-white hover:bg-slate-50 text-slate-500'
+                        }`}
+                      >
                         <button
                           type="button"
                           onClick={(e) => {
@@ -1350,19 +1277,19 @@ export default function App() {
                               }
                             );
                           }}
-                          className="absolute -top-1 -right-1 bg-red-500 hover:bg-red-600 text-white rounded-full p-0.5 z-10 shadow-sm"
+                          className="absolute -top-1 -right-1 bg-red-500 hover:bg-red-600 text-white rounded-full p-0.5 z-10 shadow-sm cursor-pointer"
                           title="삭제"
                         >
                           <X className="w-2 h-2" />
                         </button>
-                      )}
-                      <div className="w-full h-7 bg-slate-100 rounded overflow-hidden mb-1 pointer-events-none">
-                        <img src={resolveAssetPath(preset.img)} className="w-full h-full object-cover animate-fade-in" referrerPolicy="no-referrer" />
+                        <div className="w-full h-7 bg-slate-100 rounded overflow-hidden mb-1 pointer-events-none">
+                          <img src={resolveAssetPath(preset.url)} className="w-full h-full object-cover animate-fade-in" referrerPolicy="no-referrer" />
+                        </div>
+                        <span className="block truncate text-[7.5px] leading-none font-medium">{preset.label}</span>
                       </div>
-                      <span className="block truncate text-[7.5px] leading-none font-medium">{preset.label}</span>
-                    </button>
-                  ))}
-                </div>
+                    ))}
+                  </div>
+                )}
                 
                 {/* Genuine File Upload or Manual Link */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2">
@@ -1405,25 +1332,6 @@ export default function App() {
                     </div>
                     
                     {formImage && 
-                     !['./assets/images/ug_orange_tank_1781680550681.jpg',
-                       './assets/images/un_agitation_tank_1781680565572.jpg',
-                       './assets/images/sts_band_tank_1781680585226.jpg',
-                       './assets/images/deck_type_tank_1781680599823.jpg',
-                       './assets/images/ud_drainage_tank_1781660890538.jpg',
-                       './assets/images/un120_white_tank_new_1783494600723.jpg',
-                       './assets/images/kid_dosing_tank_1783488058945.jpg',
-                       './assets/images/un_mixed_agitation_1783488076632.jpg',
-                       './assets/images/un_standard_tank_1783488042149.jpg',
-                       '/assets/images/ug_orange_tank_1781680550681.jpg',
-                       '/assets/images/un_agitation_tank_1781680565572.jpg',
-                       '/assets/images/sts_band_tank_1781680585226.jpg',
-                       '/assets/images/deck_type_tank_1781680599823.jpg',
-                       '/assets/images/ud_drainage_tank_1781660890538.jpg',
-                       '/assets/images/un120_white_tank_new_1783494600723.jpg',
-                       '/assets/images/kid_dosing_tank_1783488058945.jpg',
-                       '/assets/images/un_mixed_agitation_1783488076632.jpg',
-                       '/assets/images/un_standard_tank_1783488042149.jpg'
-                     ].includes(formImage) && 
                      !customPresets.some(p => p.url === formImage) && (
                       <button
                         type="button"
