@@ -156,12 +156,12 @@ export default function ProductSpecsList({ onQuoteClick }: ProductSpecsProps) {
             <span className="text-[10px] font-bold text-amber-500 uppercase tracking-widest block">기술 엔지니어 전담 서비스</span>
             <h4 className="font-extrabold text-white text-base md:text-lg">원하는 맞춤형 크기와 성형이 있으신가요?</h4>
             <p className="text-slate-300 text-xs leading-relaxed">
-              위의 기성 모델 이외의 완벽 배출(UD) Conical 바닥 탱크, 이중 단열 보온 수조, 혹은 고점도 약품 전용 교반 모터 기어 스펙은 사내 기술 고문이 직접 가설 견적 설계 해드립니다.
+              위의 기성 모델 이외의 제작 요청은 전화문의 주시면 견적 설계 해드립니다.
             </p>
           </div>
           <div className="bg-slate-900 px-5 py-4 rounded-xl border border-slate-800 flex flex-col sm:flex-row sm:items-center gap-3 text-xs font-bold text-slate-300 shrink-0">
-            <span>직통 기술 설계 연구부:</span>
-            <span className="text-amber-400 text-base font-black">010-3887-6107</span>
+            <span>직통전화 :</span>
+            <span className="text-amber-400 text-base font-black">055-385-2696</span>
           </div>
         </div>
       </section>
