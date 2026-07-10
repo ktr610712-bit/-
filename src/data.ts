@@ -5,42 +5,31 @@
 
 import { Product, Inquiry } from './types';
 
-// Import image assets explicitly so Vite can bundle them and generate robust paths in the production build
-import ugImg from './assets/images/regenerated_image_1781685239299.png';
-import unImg from './assets/images/regenerated_image_1781688139818.png';
-import deckImg from './assets/images/regenerated_image_1781685912943.png';
-import udImg from './assets/images/regenerated_image_1781685907524.png';
-import smallImg from './assets/images/un120_white_tank_1783489320557.jpg';
-import kidImg from './assets/images/uploaded_tank_6_1781683278949.jpg';
-import stsImg from './assets/images/regenerated_image_1781688142077.png';
-import deckLadderImg from './assets/images/uploaded_tank_8_1781683306440.jpg';
-
-// Let's resolve the actual image URLs we generated.
-// Mapping the uploaded raw original images to their correct product labels
+// Mapping the uploaded raw original images to their correct product labels in order from 1 to 8.
 const images = {
-  // 01. UG 주황 철재거치 -> 사용자가 제공한 새로운 고화질 이미지 적용 (1번)
-  ug: ugImg,
+  // 01. PE 케미칼탱크 UG형 (1번) - 3번 고화질 야외 오렌지 보강형 탱크군 사진
+  ug: '/assets/images/ug_orange_tank_1781680550681.jpg',
   
-  // 09. UN형 고화질 교반탱크 적용 (9번으로 대체)
-  un: unImg,
+  // 02. PE 케미칼탱크 교반형 (2번) - 6번 고화질 실내 정밀 보강형 탱크군 사진
+  un: '/assets/images/un_agitation_tank_1781680565572.jpg',
   
-  // 03. 안전 가드데크 사다리 -> 고화질 재생성 파일 적용 (3번)
-  deck: deckImg,
+  // 03. PE 케미칼탱크 STS밴드형 (3번) - 고화질 STS 광택 보강형 탱크 사진
+  sts: '/assets/images/sts_band_tank_1781680585226.jpg',
   
-  // 04. 공장 거치형 주황보강 -> 고화질 재생성 파일 적용 (4번)
-  ud: udImg,
+  // 04. PE 케미칼탱크 DECK 형 (4번) - 2번 고화질 야외 가드데크 사다리형 안전 탱크 사진
+  deck: '/assets/images/deck_type_tank_1781680599823.jpg',
   
-  // 05. UN120 눈금 백색원형 (Cylindrical container with graduation lines and UN120 print)
-  small: smallImg,
+  // 05. PE 케미칼탱크 하부배출형 (5번) - 고화질 하부 콘형 완전배출 탱크 사진
+  ud: '/assets/images/ud_drainage_tank_1781660890538.jpg',
   
-  // 06. 사각 도징용 백색탱크 (White square dosing container with white lid)
-  kid: kidImg,
+  // 06. PE 케미칼탱크 UN형 (6번) - 7번 고화질 백색 원형 UN120 눈금식 정량 약질 탱크 사진
+  small: '/assets/images/un120_white_tank_new_1783494600723.jpg',
   
-  // 10. STS보강 고화질 탱크 -> 고화질 재생성 파일 적용 (10번)
-  sts: stsImg,
+  // 07. PE 케미칼탱크 KID형 (7번) - 1번 고화질 사각 KID형 백색 도징 약액 저장조 사진
+  kid: '/assets/images/kid_dosing_tank_1783488058945.jpg',
   
-  // 08. 야외 주황 가드 사다리 (Orange tank safety frame and yellow cage ladder inside facility)
-  deck_ladder: deckLadderImg,
+  // 08. PE 케미칼탱크 UN조 교반형 (8번) - 5번 고화질 실내 정밀 오렌지-가드 사다리 복합형 탱크 사진
+  deck_ladder: '/assets/images/un_mixed_agitation_1783488076632.jpg',
 };
 
 export const PRODUCT_DATA: Product[] = [

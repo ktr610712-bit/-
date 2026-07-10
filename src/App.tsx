@@ -89,35 +89,28 @@ export default function App() {
   const [heroImageUrl, setHeroImageUrl] = useState<string>(() => {
     const saved = localStorage.getItem('UW_HERO_IMAGE');
     const validHeroSet = new Set([
-      '/assets/images/regenerated_image_1781685239299.png',
-      '/assets/images/regenerated_image_1781685912943.png',
-      '/assets/images/regenerated_image_1781685907524.png',
-      '/assets/images/regenerated_image_1781688139818.png',
-      '/assets/images/regenerated_image_1781688142077.png',
-      '/assets/images/uploaded_tank_1_1781683205180.jpg',
-      '/assets/images/un120_white_tank_1783489320557.jpg',
-      '/assets/images/uploaded_tank_2_1781683222315.jpg',
-      '/assets/images/uploaded_tank_3_1781683237138.jpg',
-      '/assets/images/uploaded_tank_4_1781683252954.jpg',
-      '/assets/images/uploaded_tank_5_1781683266079.jpg',
-      '/assets/images/uploaded_tank_6_1781683278949.jpg',
-      '/assets/images/uploaded_tank_7_1781683291987.jpg',
-      '/assets/images/uploaded_tank_8_1781683306440.jpg',
-      '/assets/images/un_standard_tank_1783488042149.jpg',
+      '/assets/images/ug_orange_tank_1781680550681.jpg',
+      '/assets/images/un_agitation_tank_1781680565572.jpg',
+      '/assets/images/sts_band_tank_1781680585226.jpg',
+      '/assets/images/deck_type_tank_1781680599823.jpg',
+      '/assets/images/ud_drainage_tank_1781660890538.jpg',
+      '/assets/images/un120_white_tank_new_1783494600723.jpg',
       '/assets/images/kid_dosing_tank_1783488058945.jpg',
-      '/assets/images/un_mixed_agitation_1783488076632.jpg'
+      '/assets/images/un_mixed_agitation_1783488076632.jpg',
+      '/assets/images/un_standard_tank_1783488042149.jpg'
     ]);
 
-    if (saved && (saved.includes('uploaded_tank_1_1781683205180.jpg') || saved.includes('uploaded_tank_5_1781683266079.jpg'))) {
-      localStorage.setItem('UW_HERO_IMAGE', '/assets/images/un120_white_tank_1783489320557.jpg');
-      return '/assets/images/un120_white_tank_1783489320557.jpg';
+    if (saved) {
+      // Extract only the filename and construct absolute path
+      const lastSlash = saved.lastIndexOf('/');
+      const filename = lastSlash !== -1 ? saved.substring(lastSlash + 1) : saved;
+      const normalized = `/assets/images/${filename}`;
+      if (validHeroSet.has(normalized)) {
+        return normalized;
+      }
     }
-
-    if (saved && validHeroSet.has(saved)) {
-      return saved;
-    }
-    // 캐시가 깨져있거나, 구버전 주소이거나, 경로가 올바르지 않으면 1번 원본 UN120 백색원형 사진으로 실시간 동기 복구합니다.
-    return '/assets/images/un120_white_tank_1783489320557.jpg';
+    // 캐시가 깨져있거나, 구버전 주소이거나, 경로가 올바르지 않으면 실시간 동기 복구합니다.
+    return '/assets/images/ug_orange_tank_1781680550681.jpg';
   });
   const [showImageEditModal, setShowImageEditModal] = useState<boolean>(false);
   const [imageEditTemp, setImageEditTemp] = useState<string>('');
@@ -150,9 +143,13 @@ export default function App() {
               categoryName = 'UD 완전배출 탱크';
             }
 
-            let image = edited.image || dp.image;
-            if (dp.id === 'un-standard-tank' && (!image || image.includes('uploaded_tank_5_1781683266079.jpg') || image.includes('uploaded_tank_1_1781683205180.jpg'))) {
-              image = '/assets/images/un120_white_tank_1783489320557.jpg';
+            let image = dp.image;
+            if (edited.image) {
+              const lowerImg = edited.image.toLowerCase();
+              // Keep only real-time UI base64 uploads and blob URLs, otherwise default to latest PRODUCT_DATA paths to avoid stale cache boxes
+              if (lowerImg.startsWith('data:') || lowerImg.startsWith('blob:')) {
+                image = edited.image;
+              }
             }
 
             return {
@@ -177,6 +174,12 @@ export default function App() {
   const [inquiries, setInquiries] = useState<Inquiry[]>(() => {
     const saved = localStorage.getItem('UW_INQUIRIES');
     return saved ? JSON.parse(saved) : INITIAL_INQUIRIES;
+  });
+
+  // 사용자 지정 이미지 프리셋 상태 관리 (로컬 스토리지에 유지)
+  const [customPresets, setCustomPresets] = useState<{ id: string; label: string; url: string }[]>(() => {
+    const saved = localStorage.getItem('UW_CUSTOM_PRESETS');
+    return saved ? JSON.parse(saved) : [];
   });
 
   // Product Form Modal States (For Create & Edit)
@@ -237,7 +240,7 @@ export default function App() {
          !savedHero.includes('localhost'))
       )) {
         localStorage.removeItem('UW_HERO_IMAGE');
-        setHeroImageUrl('/assets/images/regenerated_image_1781685239299.png');
+        setHeroImageUrl('/assets/images/ug_orange_tank_1781680550681.jpg');
       }
     } catch (e) {
       console.error('Storage sanitizer helper error:', e);
@@ -259,6 +262,14 @@ export default function App() {
       console.warn('Local storage write limit or access denied:', e);
     }
   }, [inquiries]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('UW_CUSTOM_PRESETS', JSON.stringify(customPresets));
+    } catch (e) {
+      console.warn('Local storage write limit or access denied:', e);
+    }
+  }, [customPresets]);
 
   useEffect(() => {
     try {
@@ -353,7 +364,7 @@ export default function App() {
     setEditingProduct(null);
     setFormName('');
     setFormCategory('UG_STANDARD');
-    setFormImage('/assets/images/ug_standard_tank_1781660874171.jpg');
+    setFormImage('/assets/images/ug_orange_tank_1781680550681.jpg');
     setFormCapacity('10,000 L (10톤)');
     setFormDimensions('Ø 2,500 x H 3,200 mm');
     setFormModel('UW-UG-10000');
@@ -530,7 +541,7 @@ export default function App() {
 
   const handleImageEditSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setHeroImageUrl(imageEditTemp.trim() || '/assets/images/un120_white_tank_1783489320557.jpg');
+    setHeroImageUrl(imageEditTemp.trim() || '/assets/images/ug_orange_tank_1781680550681.jpg');
     setShowImageEditModal(false);
   };
 
@@ -725,51 +736,138 @@ export default function App() {
                       </div>
                     </div>
 
-                     <div className="lg:col-span-8 bg-slate-950/40 p-4 rounded-xl border border-slate-800/60 space-y-2.5 flex flex-col justify-between">
-                       <div>
-                         <span className="text-[11px] font-extrabold text-orange-400 block uppercase tracking-wider">02. 실물 고화질 원본 & AI 재생성 사진 (총 13종 프리셋) 메인 배너 연결</span>
-                         <span className="text-slate-400 text-3xs font-medium block leading-normal">아래 버튼을 누르면 메인 탑 배너의 대표 사진을 귀하가 지정한 사진으로 즉각 교환 연동시킵니다.</span>
-                       </div>
- 
-                       <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-1.5 mt-1 max-h-40 overflow-y-auto pr-1">
-                         {[
-                           { label: '01. 원본: UN120 백색원형', url: '/assets/images/un120_white_tank_1783489320557.jpg' },
-                           { label: '02. 원본: 소형 백색 200L', url: '/assets/images/uploaded_tank_2_1781683222315.jpg' },
-                           { label: '03. 원본: 가드데크 사다리 10톤', url: '/assets/images/uploaded_tank_3_1781683237138.jpg' },
-                           { label: '04. 원본: 공장 주황보강 15톤', url: '/assets/images/uploaded_tank_4_1781683252954.jpg' },
-                           { label: '05. 원본: UN120 눈금 원형', url: '/assets/images/uploaded_tank_5_1781683266079.jpg' },
-                           { label: '06. 원본: 사각 도징용 백색탱크', url: '/assets/images/uploaded_tank_6_1781683278949.jpg' },
-                           { label: '07. 원본: 광택 STS 보강 밴드', url: '/assets/images/uploaded_tank_7_1781683291987.jpg' },
-                           { label: '08. 원본: 야외 주황 가드 사다리', url: '/assets/images/uploaded_tank_8_1781683306440.jpg' },
-                           { label: '★ AI: UG 오렌지 철재거치', url: '/assets/images/regenerated_image_1781685239299.png' },
-                           { label: '★ AI: 안전 가드데크 사다리', url: '/assets/images/regenerated_image_1781685912943.png' },
-                           { label: '★ AI: 공장 거치형 주황보강', url: '/assets/images/regenerated_image_1781685907524.png' },
-                           { label: '★ AI: UN형 교반탱크', url: '/assets/images/regenerated_image_1781688139818.png' },
-                           { label: '★ AI: STS보강 고화질 탱크', url: '/assets/images/regenerated_image_1781688142077.png' },
-                         ].map((preset, index) => {
-                           const isCurrent = heroImageUrl === preset.url;
-                           return (
-                             <button
-                               key={index}
-                               onClick={() => {
-                                 setHeroImageUrl(preset.url);
-                                 setImageEditTemp(preset.url);
-                               }}
-                               className={`p-1.5 rounded-lg text-[10px] font-semibold text-left transition-all border shrink-0 flex items-center justify-between cursor-pointer ${
-                                 isCurrent 
-                                   ? 'border-orange-500 bg-orange-500/10 text-orange-400 font-extrabold' 
-                                   : 'border-slate-850 bg-slate-900 hover:border-slate-700 text-slate-400'
-                               }`}
-                             >
-                               <span className="truncate">{preset.label}</span>
-                               {isCurrent && <span className="w-1.5 h-1.5 rounded-full bg-orange-400 shrink-0 ml-1"></span>}
-                             </button>
-                           );
-                         })}
+                      <div className="lg:col-span-8 bg-slate-950/40 p-4 rounded-xl border border-slate-800/60 space-y-2.5 flex flex-col justify-between">
+                        <div>
+                          <span className="text-[11px] font-extrabold text-orange-400 block uppercase tracking-wider">02. 실물 고화질 원본 & AI 재생성 사진 (총 13종 프리셋) 메인 배너 연결</span>
+                          <span className="text-slate-400 text-3xs font-medium block leading-normal">아래 버튼을 누르면 메인 탑 배너의 대표 사진을 귀하가 지정한 사진으로 즉각 교환 연동시킵니다.</span>
+                        </div>
+  
+                        <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-1.5 mt-1 max-h-40 overflow-y-auto pr-1">
+                          {[
+                            { label: '01. 원본: UN120 백색원형', url: '/assets/images/un120_white_tank_1783489320557.jpg' },
+                            { label: '02. 원본: 소형 백색 200L', url: '/assets/images/uploaded_tank_2_1781683222315.jpg' },
+                            { label: '03. 원본: 가드데크 사다리 10톤', url: '/assets/images/uploaded_tank_3_1781683237138.jpg' },
+                            { label: '04. 원본: 공장 주황보강 15톤', url: '/assets/images/uploaded_tank_4_1781683252954.jpg' },
+                            { label: '05. 원본: UN120 눈금 원형', url: '/assets/images/uploaded_tank_5_1781683266079.jpg' },
+                            { label: '06. 원본: 사각 도징용 백색탱크', url: '/assets/images/uploaded_tank_6_1781683278949.jpg' },
+                            { label: '07. 원본: 광택 STS 보강 밴드', url: '/assets/images/uploaded_tank_7_1781683291987.jpg' },
+                            { label: '08. 원본: 야외 주황 가드 사다리', url: '/assets/images/uploaded_tank_8_1781683306440.jpg' },
+                            { label: '★ AI: UG 오렌지 철재거치', url: '/assets/images/regenerated_image_1781685239299.png' },
+                            { label: '★ AI: 안전 가드데크 사다리', url: '/assets/images/regenerated_image_1781685912943.png' },
+                            { label: '★ AI: 공장 거치형 주황보강', url: '/assets/images/regenerated_image_1781685907524.png' },
+                            { label: '★ AI: UN형 교반탱크', url: '/assets/images/regenerated_image_1781688139818.png' },
+                            { label: '★ AI: STS보강 고화질 탱크', url: '/assets/images/regenerated_image_1781688142077.png' },
+                          ].map((preset, index) => {
+                            const isCurrent = heroImageUrl === preset.url;
+                            return (
+                              <button
+                                key={index}
+                                onClick={() => {
+                                  setHeroImageUrl(preset.url);
+                                  setImageEditTemp(preset.url);
+                                }}
+                                className={`p-1.5 rounded-lg text-[10px] font-semibold text-left transition-all border shrink-0 flex items-center justify-between cursor-pointer ${
+                                  isCurrent 
+                                    ? 'border-orange-500 bg-orange-500/10 text-orange-400 font-extrabold' 
+                                    : 'border-slate-850 bg-slate-900 hover:border-slate-700 text-slate-400'
+                                }`}
+                              >
+                                <span className="truncate">{preset.label}</span>
+                                {isCurrent && <span className="w-1.5 h-1.5 rounded-full bg-orange-400 shrink-0 ml-1"></span>}
+                              </button>
+                            );
+                          })}
+                        </div>
+
+                        {/* 나만의 직접 업로드 프리셋 관리 기능 */}
+                        <div className="mt-3 pt-3 border-t border-slate-900/60 space-y-2">
+                          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                            <span className="text-[10px] font-extrabold text-slate-300 uppercase tracking-wider flex items-center gap-1">
+                              <Upload className="w-3.5 h-3.5 text-orange-400" />
+                              나만의 직접 등록 프리셋 ({customPresets.length}개)
+                            </span>
+                            <div className="flex items-center gap-1.5">
+                              <input
+                                type="text"
+                                placeholder="프리셋 이름 (생략 가능)"
+                                id="heroPresetNameInput"
+                                className="text-[10px] px-2.5 py-1 bg-slate-900 border border-slate-850 rounded-lg text-slate-300 focus:outline-none focus:border-orange-500 w-36 font-semibold"
+                              />
+                              <label className="px-2.5 py-1 rounded-lg bg-orange-600 hover:bg-orange-500 text-white text-[10px] font-extrabold transition-all cursor-pointer flex items-center gap-1">
+                                <span>새 이미지 파일 선택</span>
+                                <input
+                                  type="file"
+                                  accept="image/*"
+                                  onChange={(e) => {
+                                    const file = e.target.files?.[0];
+                                    if (file) {
+                                      compressAndResizeImage(file, (compressedBase64) => {
+                                        const inputElement = document.getElementById('heroPresetNameInput') as HTMLInputElement;
+                                        const presetName = inputElement?.value.trim() || `사용자: ${file.name.split('.')[0]}`;
+                                        const newPreset = {
+                                          id: `custom_${Date.now()}`,
+                                          label: presetName,
+                                          url: compressedBase64
+                                        };
+                                        setCustomPresets(prev => [...prev, newPreset]);
+                                        if (inputElement) inputElement.value = '';
+                                      });
+                                    }
+                                  }}
+                                  className="hidden"
+                                />
+                              </label>
+                            </div>
+                          </div>
+
+                          {customPresets.length === 0 ? (
+                            <p className="text-[9.5px] text-slate-500 italic">현재 직접 등록한 프리셋이 없습니다. 위 업로드 버튼으로 나만의 고화질 탱크 사진을 프리셋으로 등록해보세요!</p>
+                          ) : (
+                            <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-1.5 max-h-32 overflow-y-auto pr-1">
+                              {customPresets.map((preset) => {
+                                const isCurrent = heroImageUrl === preset.url;
+                                return (
+                                  <div
+                                    key={preset.id}
+                                    className={`p-1.5 px-2 rounded-lg text-[10px] font-semibold text-left transition-all border shrink-0 flex items-center justify-between cursor-pointer ${
+                                      isCurrent 
+                                        ? 'border-orange-500 bg-orange-500/10 text-orange-400 font-extrabold' 
+                                        : 'border-slate-850 bg-slate-900 hover:border-slate-700 text-slate-400'
+                                    }`}
+                                    onClick={() => {
+                                      setHeroImageUrl(preset.url);
+                                      setImageEditTemp(preset.url);
+                                    }}
+                                  >
+                                    <span className="truncate flex-1 mr-1">{preset.label}</span>
+                                    <div className="flex items-center gap-1 shrink-0">
+                                      {isCurrent && <span className="w-1.5 h-1.5 rounded-full bg-orange-400 shrink-0"></span>}
+                                      <button
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          triggerConfirm(
+                                            '사용자 프리셋 삭제',
+                                            `"${preset.label}" 프리셋을 삭제하시겠습니까?`,
+                                            () => {
+                                              setCustomPresets(prev => prev.filter(p => p.id !== preset.id));
+                                            }
+                                          );
+                                        }}
+                                        className="p-0.5 rounded text-slate-500 hover:text-red-400 hover:bg-slate-800 transition-all cursor-pointer"
+                                        title="삭제"
+                                      >
+                                        <X className="w-2.5 h-2.5" />
+                                      </button>
+                                    </div>
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          )}
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
                 )}
                 
                 {/* Product Search Filtering HUD status */}
@@ -1089,18 +1187,18 @@ export default function App() {
               </div>
 
               {/* Quick presets for easier admin choice */}
-              <div className="hidden">
+              <div className="space-y-2 mt-4">
                 <span className="text-[10px] font-extrabold text-slate-500 uppercase tracking-wider block">실물 고화질 탱크 사진 8종 선택</span>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
                   {[
-                    { label: '01. UG 오렌지 철재거치', url: '/assets/images/regenerated_image_1781685239299.png' },
-                    { label: '02. 사각 도징용 백색', url: '/assets/images/uploaded_tank_6_1781683278949.jpg' },
-                    { label: '03. 안전 가드데크 사다리', url: '/assets/images/regenerated_image_1781685912943.png' },
-                    { label: '04. 공장 거치형 주황보강', url: '/assets/images/regenerated_image_1781685907524.png' },
-                    { label: '05. 소형 백색 주입용', url: '/assets/images/uploaded_tank_2_1781683222315.jpg' },
-                    { label: '06. UN120 눈금 백색원형', url: '/assets/images/uploaded_tank_5_1781683266079.jpg' },
-                    { label: '07. 광택 STS 보강 밴드', url: '/assets/images/uploaded_tank_7_1781683291987.jpg' },
-                    { label: '08. 야외 주황 가드 사다리', url: '/assets/images/uploaded_tank_8_1781683306440.jpg' },
+                    { label: '01. UG 오렌지 철재거치', url: './assets/images/ug_orange_tank_1781680550681.jpg' },
+                    { label: '02. 교반형 실내 정밀 보강', url: './assets/images/un_agitation_tank_1781680565572.jpg' },
+                    { label: '03. 광택 STS 보강 밴드', url: './assets/images/sts_band_tank_1781680585226.jpg' },
+                    { label: '04. 안전 가드데크 사다리', url: './assets/images/deck_type_tank_1781680599823.jpg' },
+                    { label: '05. 하부 배출 콘형 탱크', url: './assets/images/ud_drainage_tank_1781660890538.jpg' },
+                    { label: '06. UN120 눈금 백색원형', url: './assets/images/un120_white_tank_new_1783494600723.jpg' },
+                    { label: '07. 사각 KID형 백색도징', url: './assets/images/kid_dosing_tank_1783488058945.jpg' },
+                    { label: '08. 야외 주황 가드 사다리', url: './assets/images/un_mixed_agitation_1783488076632.jpg' },
                   ].map((preset, index) => (
                     <button
                       key={index}
@@ -1117,6 +1215,30 @@ export default function App() {
                   ))}
                 </div>
               </div>
+
+              {/* Custom Presets inside modal */}
+              {customPresets.length > 0 && (
+                <div className="space-y-2 mt-4">
+                  <span className="text-[10px] font-extrabold text-slate-500 uppercase tracking-wider block">내가 직접 등록한 프리셋</span>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                    {customPresets.map((preset) => (
+                      <button
+                        key={preset.id}
+                        type="button"
+                        onClick={() => setImageEditTemp(preset.url)}
+                        className={`p-2 border text-left rounded-lg text-3xs transition-all cursor-pointer flex items-center justify-between ${
+                          imageEditTemp === preset.url 
+                            ? 'border-orange-500 bg-orange-50/50 text-orange-700 font-bold' 
+                            : 'border-slate-200 hover:border-slate-350 text-slate-600'
+                        }`}
+                      >
+                        <span className="truncate mr-1">{preset.label}</span>
+                        <span className="text-[8px] bg-orange-150 text-orange-800 px-1 rounded font-extrabold shrink-0">MY</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               <div className="flex gap-2 justify-end pt-2">
                 <button 
@@ -1190,34 +1312,50 @@ export default function App() {
               {/* Dynamic Image Preset Selector Helper */}
               <div className="space-y-2 p-3 bg-slate-50 rounded-xl border border-slate-200">
                 <span className="text-[11.5px] font-bold text-slate-700 flex items-center gap-1.5">
-                  <span className="text-orange-500 font-extrabold">📸</span> 원클릭 장비 이미지 프리셋 선택 (총 13종 완벽 지원)
+                  <span className="text-orange-500 font-extrabold">📸</span> 원클릭 장비 이미지 프리셋 선택 (총 {9 + customPresets.length}종 실물 고화질 완벽 지원)
                 </span>
-                <div className="grid grid-cols-3 sm:grid-cols-5 md:grid-cols-7 lg:grid-cols-9 xl:grid-cols-13 gap-1 max-h-44 overflow-y-auto p-1 bg-white rounded-lg border border-slate-100">
+                <div className="grid grid-cols-3 sm:grid-cols-5 md:grid-cols-7 lg:grid-cols-9 gap-1 max-h-44 overflow-y-auto p-1 bg-white rounded-lg border border-slate-100">
                   {[
-                    { label: '01. UN120 백색원형', img: '/assets/images/un120_white_tank_1783489320557.jpg' },
-                    { label: '02. 소형 백색 200L', img: '/assets/images/uploaded_tank_2_1781683222315.jpg' },
-                    { label: '03. 가드데크 10톤', img: '/assets/images/uploaded_tank_3_1781683237138.jpg' },
-                    { label: '04. 공장 주황 15톤', img: '/assets/images/uploaded_tank_4_1781683252954.jpg' },
-                    { label: '05. UN120 눈금원형', img: '/assets/images/uploaded_tank_5_1781683266079.jpg' },
-                    { label: '06. 사각 도징용 백색', img: '/assets/images/uploaded_tank_6_1781683278949.jpg' },
-                    { label: '07. 광택 STS 보강', img: '/assets/images/uploaded_tank_7_1781683291987.jpg' },
-                    { label: '08. 야외 주황 사다리', img: '/assets/images/uploaded_tank_8_1781683306440.jpg' },
-                    { label: '★ UG 주황 (AI)', img: '/assets/images/regenerated_image_1781685239299.png' },
-                    { label: '★ 가드데크 (AI)', img: '/assets/images/regenerated_image_1781685912943.png' },
-                    { label: '★ 공장 보강 (AI)', img: '/assets/images/regenerated_image_1781685907524.png' },
-                    { label: '★ UN 교반형 (AI)', img: '/assets/images/regenerated_image_1781688139818.png' },
-                    { label: '★ STS 보강 (AI)', img: '/assets/images/regenerated_image_1781688142077.png' },
+                    { id: 'std_1', label: '01. UG 오렌지 철재거치', img: './assets/images/ug_orange_tank_1781680550681.jpg', isCustom: false },
+                    { id: 'std_2', label: '02. 교반형 실내 정밀 보강', img: './assets/images/un_agitation_tank_1781680565572.jpg', isCustom: false },
+                    { id: 'std_3', label: '03. 광택 STS 보강 밴드', img: './assets/images/sts_band_tank_1781680585226.jpg', isCustom: false },
+                    { id: 'std_4', label: '04. 안전 가드데크 사다리', img: './assets/images/deck_type_tank_1781680599823.jpg', isCustom: false },
+                    { id: 'std_5', label: '05. 하부 배출 콘형 탱크', img: './assets/images/ud_drainage_tank_1781660890538.jpg', isCustom: false },
+                    { id: 'std_6', label: '06. UN120 눈금 백색원형', img: './assets/images/un120_white_tank_new_1783494600723.jpg', isCustom: false },
+                    { id: 'std_7', label: '07. 사각 KID형 백색도징', img: './assets/images/kid_dosing_tank_1783488058945.jpg', isCustom: false },
+                    { id: 'std_8', label: '08. 야외 주황 가드 사다리', img: './assets/images/un_mixed_agitation_1783488076632.jpg', isCustom: false },
+                    { id: 'std_9', label: '09. 백색 거치대형 교반형', img: './assets/images/un_standard_tank_1783488042149.jpg', isCustom: false },
+                    ...customPresets.map((p) => ({ id: p.id, label: p.label, img: p.url, isCustom: true }))
                   ].map((preset) => (
                     <button
-                      key={preset.label}
+                      key={preset.id}
                       type="button"
                       onClick={() => setFormImage(preset.img)}
-                      className={`text-[8px] font-bold rounded p-1 border text-center transition-all cursor-pointer ${
+                      className={`relative text-[8px] font-bold rounded p-1 border text-center transition-all cursor-pointer ${
                         formImage === preset.img 
                           ? 'border-orange-500 bg-orange-50 text-orange-700 font-extrabold' 
                           : 'border-slate-100 bg-white hover:bg-slate-50 text-slate-500'
                       }`}
                     >
+                      {preset.isCustom && (
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            triggerConfirm(
+                              '사용자 프리셋 삭제',
+                              `"${preset.label}" 프리셋을 삭제하시겠습니까?`,
+                              () => {
+                                setCustomPresets(prev => prev.filter(p => p.id !== preset.id));
+                              }
+                            );
+                          }}
+                          className="absolute -top-1 -right-1 bg-red-500 hover:bg-red-600 text-white rounded-full p-0.5 z-10 shadow-sm"
+                          title="삭제"
+                        >
+                          <X className="w-2 h-2" />
+                        </button>
+                      )}
                       <div className="w-full h-7 bg-slate-100 rounded overflow-hidden mb-1 pointer-events-none">
                         <img src={resolveAssetPath(preset.img)} className="w-full h-full object-cover animate-fade-in" referrerPolicy="no-referrer" />
                       </div>
@@ -1255,14 +1393,54 @@ export default function App() {
                 </div>
 
                 {formImage && (
-                  <div className="border border-slate-150 rounded-lg p-1.5 bg-white flex items-center gap-2">
-                    <div className="w-9 h-9 rounded overflow-hidden bg-slate-50 border border-slate-100 shrink-0">
-                      <img src={resolveAssetPath(formImage)} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                  <div className="border border-slate-150 rounded-lg p-1.5 bg-white flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-2 min-w-0 flex-1">
+                      <div className="w-9 h-9 rounded overflow-hidden bg-slate-50 border border-slate-100 shrink-0">
+                        <img src={resolveAssetPath(formImage)} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <span className="text-[9px] font-bold text-slate-400 block uppercase leading-none mb-0.5">제품 사진 미리보기</span>
+                        <span className="text-[8px] text-slate-400 block truncate">{formImage.startsWith('data:') ? '사용자 직접 업로드 파일' : formImage}</span>
+                      </div>
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <span className="text-[9px] font-bold text-slate-400 block uppercase leading-none mb-0.5">제품 사진 미리보기</span>
-                      <span className="text-[8px] text-slate-400 block truncate">{formImage.startsWith('data:') ? '사용자 직접 업로드 파일' : formImage}</span>
-                    </div>
+                    
+                    {formImage && 
+                     !['./assets/images/ug_orange_tank_1781680550681.jpg',
+                       './assets/images/un_agitation_tank_1781680565572.jpg',
+                       './assets/images/sts_band_tank_1781680585226.jpg',
+                       './assets/images/deck_type_tank_1781680599823.jpg',
+                       './assets/images/ud_drainage_tank_1781660890538.jpg',
+                       './assets/images/un120_white_tank_new_1783494600723.jpg',
+                       './assets/images/kid_dosing_tank_1783488058945.jpg',
+                       './assets/images/un_mixed_agitation_1783488076632.jpg',
+                       './assets/images/un_standard_tank_1783488042149.jpg',
+                       '/assets/images/ug_orange_tank_1781680550681.jpg',
+                       '/assets/images/un_agitation_tank_1781680565572.jpg',
+                       '/assets/images/sts_band_tank_1781680585226.jpg',
+                       '/assets/images/deck_type_tank_1781680599823.jpg',
+                       '/assets/images/ud_drainage_tank_1781660890538.jpg',
+                       '/assets/images/un120_white_tank_new_1783494600723.jpg',
+                       '/assets/images/kid_dosing_tank_1783488058945.jpg',
+                       '/assets/images/un_mixed_agitation_1783488076632.jpg',
+                       '/assets/images/un_standard_tank_1783488042149.jpg'
+                     ].includes(formImage) && 
+                     !customPresets.some(p => p.url === formImage) && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const presetLabel = formName.trim() || `사용자 등록 ${customPresets.length + 1}`;
+                          const newPreset = {
+                            id: `custom_${Date.now()}`,
+                            label: presetLabel,
+                            url: formImage
+                          };
+                          setCustomPresets(prev => [...prev, newPreset]);
+                        }}
+                        className="px-2 py-1 bg-orange-100 hover:bg-orange-200 text-orange-700 text-[9px] font-extrabold rounded transition-all whitespace-nowrap cursor-pointer shrink-0"
+                      >
+                        이 이미지를 프리셋으로 저장
+                      </button>
+                    )}
                   </div>
                 )}
               </div>

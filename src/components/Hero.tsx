@@ -5,6 +5,7 @@
 
 import React from 'react';
 import { Phone, Smartphone, FileSpreadsheet, ArrowRight, CheckCircle, Edit } from 'lucide-react';
+import { resolveAssetPath } from '../utils';
 
 interface HeroProps {
   onConsultClick: () => void;
@@ -76,7 +77,7 @@ export default function Hero({ onConsultClick, heroBadgeText, onEditHeroBadgeTex
             <div className="w-72 h-72 sm:w-85 sm:h-85 md:w-96 md:h-96 border-[12px] border-orange-500 rounded-full flex items-center justify-center overflow-hidden bg-slate-800 shadow-2xl relative">
               {/* Image from generate_image inside the circular frame */}
               <img
-                src={heroImageUrl}
+                src={resolveAssetPath(heroImageUrl)}
                 alt="울트라월드 PE 보강식 케미칼탱크 사진"
                 className="w-full h-full object-cover hover:scale-110 duration-700 transition-transform absolute inset-0"
                 referrerPolicy="no-referrer"

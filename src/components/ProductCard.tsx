@@ -34,10 +34,23 @@ export default function ProductCard({
   }, [product.image]);
 
   const handleImgError = () => {
+    const rawPath = product.image || '';
+
+    // If the path is a data URI, blob URL, or remote URL and failed, fallback immediately to a guaranteed asset
+    if (
+      rawPath.startsWith('data:') || 
+      rawPath.startsWith('blob:') || 
+      rawPath.startsWith('http://') || 
+      rawPath.startsWith('https://')
+    ) {
+      setImgSrc('/assets/images/ug_orange_tank_1781680550681.jpg');
+      setRetryState(4);
+      return;
+    }
+
     if (retryState === 0) {
       // First fallback: attempt direct clean public static path under /assets/images/
       // This bypasses any hashing or bundler-specific resolution.
-      const rawPath = product.image || '';
       const lastSlashIdx = rawPath.lastIndexOf('/');
       const filenameWithHash = lastSlashIdx !== -1 ? rawPath.substring(lastSlashIdx + 1) : rawPath;
       
@@ -69,18 +82,17 @@ export default function ProductCard({
         const newExt = current.endsWith('.png') ? '.PNG' : '.png';
         setImgSrc(base + newExt);
       } else {
-        setImgSrc('/assets/images/regenerated_image_1781685239299.png');
+        setImgSrc('/assets/images/ug_orange_tank_1781680550681.jpg');
       }
       setRetryState(2);
     } else if (retryState === 2) {
       // Third fallback: Handle case differences for the filename itself or directory
-      const rawPath = product.image || '';
       const fn = rawPath.substring(rawPath.lastIndexOf('/') + 1).toLowerCase();
       setImgSrc(`/assets/images/${fn}`);
       setRetryState(3);
     } else if (retryState === 3) {
-      // Fourth fallback: fallback to a guaranteed high-resolution working PNG asset
-      setImgSrc('/assets/images/regenerated_image_1781685239299.png');
+      // Fourth fallback: fallback to a guaranteed high-resolution working JPG asset
+      setImgSrc('/assets/images/ug_orange_tank_1781680550681.jpg');
       setRetryState(4);
     }
   };
